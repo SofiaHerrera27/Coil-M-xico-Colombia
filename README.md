@@ -5,7 +5,7 @@
 ## 1. Tablero de Actividades y Seguimiento (Kanban)
 El proyecto se gestiona mediante el marco de trabajo **Scrum/Kanban** integrado directamente en el repositorio de GitHub.
 
-* **URL del Tablero de Trabajo:** [- Tablero Kanban (COIL México-Colombia)]
+* **URL del Tablero de Trabajo:** [https://github.com/users/SofiaHerrera27/projects/3/views/1]
 * **Criterio de Terminado (Definition of Done - DoD):** Una Historia de Usuario se considera completamente **Done (Hecha)** cuando:
   1. El código cumple con los criterios de aceptación (Dado/Cuando/Entonces).
   2. Ha sido probado por el equipo de Análisis (México) sin presentar errores de ejecución.
