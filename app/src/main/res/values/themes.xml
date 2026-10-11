@@ -1,0 +1,9 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Base.Theme.ParqueVivo" parent="Theme.Material3.Light.NoActionBar">
+        <item name="colorPrimary">@color/pv_verde_oscuro</item>
+        <item name="colorOnPrimary">@color/pv_blanco</item>
+        <item name="android:colorBackground">@color/pv_fondo</item>
+    </style>
+
+    <style name="Theme.ParqueVivo" parent="Base.Theme.ParqueVivo" />
+</resources>

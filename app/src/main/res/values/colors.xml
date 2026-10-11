@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="pv_fondo">#F1F8E9</color>
+    <color name="pv_verde_oscuro">#1B5E20</color>
+    <color name="pv_blanco">#FFFFFF</color>
+    <color name="pv_texto">#212121</color>
+    <color name="pv_texto_suave">#757575</color>
+</resources>
