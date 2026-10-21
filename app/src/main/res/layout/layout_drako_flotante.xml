@@ -18,6 +18,16 @@
         android:textSize="14sp"
         android:visibility="gone" />
 
+    <!-- Botón de interacción de Drako para la Caza de Colores -->
+    <Button
+        android:id="@+id/btnDrakoAccion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:text="¡Buscar Color!"
+        android:textSize="12sp"
+        android:visibility="gone" />
+
     <ImageView
         android:id="@+id/imgDrako"
         android:layout_width="80dp"
