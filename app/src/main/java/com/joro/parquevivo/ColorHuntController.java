@@ -4,48 +4,65 @@ import android.graphics.Bitmap;
 
 public class ColorHuntController {
 
-    // Interfaz Callback: Permite notificar a la Activity cuando se valida un color sin acoplar las clases
+    // Interfaz Callback: Permite notificar a la Activity el progreso del escaneo y la confirmación
     public interface ColorDetectionListener {
-        void onColorDetected();
+        void onProgressUpdate(int progress);
+        void onColorVerified();
     }
 
-    // Variables de estado del controlador
-    private float[] currentLowerHsv;           // Rango inferior activo enviado por el acertijo
-    private float[] currentUpperHsv;           // Rango superior activo enviado por el acertijo
-    private boolean isScanningActive = false; // Flag para activar/pausar la CPU de procesamiento
-    private ColorDetectionListener listener;  // Referencia al receptor de eventos de éxito
+    private float[] currentLowerHsv;
+    private float[] currentUpperHsv;
+    private boolean isScanningActive = false;
+    private ColorDetectionListener listener;
 
-    // Asigna el color que se debe buscar en el acertijo actual
+    private int currentProgress = 0;
+    private static final int MAX_PROGRESS = 100;
+    private static final int INCREMENT = 20; // Avance por cuadro detectado
+    private static final int DECREMENT = 10; // Reducción si se pierde la toma
+
     public void setTargetColor(float[] lower, float[] upper, ColorDetectionListener listener) {
         this.currentLowerHsv = lower;
         this.currentUpperHsv = upper;
         this.listener = listener;
+        resetProgress();
     }
 
-    // Controla el interruptor de escaneo
+    public void resetProgress() {
+        this.currentProgress = 0;
+    }
+
     public void setScanningActive(boolean active) {
         this.isScanningActive = active;
+        if (!active) {
+            resetProgress();
+        }
     }
 
-    // Consulta el estado actual de la búsqueda
     public boolean isScanningActive() {
         return isScanningActive;
     }
 
-    // Procesa el fotograma entregado por CameraX
     public void processFrameBitmap(Bitmap bitmap) {
-        //verificacion:
-        // Cláusula de guarda: Si el juego está en pausas o no hay color asignado, cancela el análisis inmediatamente
-        if (!isScanningActive || currentLowerHsv == null || currentUpperHsv == null) {
+        if (!isScanningActive || currentLowerHsv == null || currentUpperHsv == null || bitmap == null) {
             return;
         }
 
-        // Llama al detector de color nativo
+        // Evalúa con la clase nativa
         boolean detected = NativeColorDetector.isColorInCenter(bitmap, currentLowerHsv, currentUpperHsv);
 
-        // Si se encuentra el color objetivo, dispara el evento hacia la Activity
-        if (detected && listener != null) {
-            listener.onColorDetected();
+        if (detected) {
+            currentProgress = Math.min(MAX_PROGRESS, currentProgress + INCREMENT);
+        } else {
+            currentProgress = Math.max(0, currentProgress - DECREMENT);
+        }
+
+        if (listener != null) {
+            listener.onProgressUpdate(currentProgress);
+
+            if (currentProgress >= MAX_PROGRESS) {
+                isScanningActive = false; // Detener escaneo al completar
+                listener.onColorVerified();
+            }
         }
     }
 }

@@ -138,6 +138,11 @@ public class DrakoHelper {
         handler.postDelayed(() -> parpadear(0), 1500);
     }
 
+    public void iniciarSinSaludo() {
+        handler.removeCallbacksAndMessages(null);
+        handler.postDelayed(() -> parpadear(0), 1500);
+    }
+
     public void detener() {
         handler.removeCallbacksAndMessages(null);
         if (imgDrako != null && abierto != null) {
@@ -275,7 +280,7 @@ public class DrakoHelper {
         tvGlobo.setText(textoAMostrar);
         tvGlobo.setVisibility(View.VISIBLE);
 
-        // activa esta llamada para hablar automáticamente:
+        // activar este llamada para poner hablar automáticamente faltan audios:
         // hablar(textoAMostrar);
 
         // Preparar el siguiente mensaje para el próximo toque

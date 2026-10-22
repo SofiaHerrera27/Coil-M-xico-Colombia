@@ -1,42 +1,52 @@
 package com.joro.parquevivo;
 
-import java.util.Locale;
-
 public class ColorHSVUtils {
-    //Declaracion de variables
 
-
-    //Cordenadas para validacion
-    //margen inferior de validacion
+    // Margen inferior de validacion (Hue 0-360, Sat 0-1, Val 0-1)
     public static float[] getLowerHSV(String color) {
+        if (color == null) return new float[]{0f, 0f, 0f};
+
         switch (color.toUpperCase()) {
             case "ROJO":
-                return new float[]{0f, 0.5f, 0.3f};
-            case "Verde":
-                return new float[]{70f, 0.3f, 0.3f};
-            case "Azul":
-                return new float[]{180f, 0.3f, 0.3f};
+                return new float[]{340f, 0.25f, 0.20f};
+            case "VERDE":
+                return new float[]{65f, 0.20f, 0.20f};
+            case "AZUL":
+                return new float[]{170f, 0.20f, 0.20f};
             case "AMARILLO":
-                return new float[]{40f, 0.5f, 0.5f};
+                return new float[]{35f, 0.25f, 0.25f};
+            case "NARANJA":
+                return new float[]{10f, 0.25f, 0.25f};
+            case "MORADO":
+                return new float[]{240f, 0.15f, 0.15f};
+            case "ROSA":
+                return new float[]{290f, 0.15f, 0.25f};
             default:
                 return new float[]{0f, 0f, 0f};
         }
     }
-    //margen superior de validacion
-        public static float[]getUpperHSV(String color){
-            switch (color.toUpperCase()){
-                case "ROJO":
-                    return new float[]{20f, 1.0f, 1.0f};
-                case "VERDE":
-                    return new float[]{160f, 1.0f, 1.0f};
-                case "AZUL":
-                    return new float[]{250f, 1.0f, 1.0f};
-                case "AMARILLO":
-                    return new float[]{70f, 1.0f, 1.0f};
-                default:
-                    return new float[]{0f, 0f, 0f};
-            }
 
+    // Margen superior de validacion
+    public static float[] getUpperHSV(String color) {
+        if (color == null) return new float[]{360f, 1.0f, 1.0f};
+
+        switch (color.toUpperCase()) {
+            case "ROJO":
+                return new float[]{25f, 1.0f, 1.0f};
+            case "VERDE":
+                return new float[]{160f, 1.0f, 1.0f};
+            case "AZUL":
+                return new float[]{255f, 1.0f, 1.0f};
+            case "AMARILLO":
+                return new float[]{68f, 1.0f, 1.0f};
+            case "NARANJA":
+                return new float[]{34f, 1.0f, 1.0f};
+            case "MORADO":
+                return new float[]{289f, 1.0f, 1.0f};
+            case "ROSA":
+                return new float[]{350f, 1.0f, 1.0f};
+            default:
+                return new float[]{360f, 1.0f, 1.0f};
         }
-
     }
+}

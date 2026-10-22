@@ -31,7 +31,7 @@ public class NativeColorDetector {
         // Bucle que recorre la región de interés (ROI) en el centro de la pantalla.
         // Se salta de a 4 píxeles (x += 4) para optimizar el rendimiento de la CPU.
         for(int x=centerX-sampleSize;x<centerX+sampleSize;x+=4){
-            for(int y=centerY-sampleSize; y<centerX+sampleSize;x+=4){
+            for(int y=centerY-sampleSize; y<centerY+sampleSize;y+=4){
 
                 if(x>=0 && x<width && y>=0 && y<height){
                     //traer color del pixel en formato ARGB(int)

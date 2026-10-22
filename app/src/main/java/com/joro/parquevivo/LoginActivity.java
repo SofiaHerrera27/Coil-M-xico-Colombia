@@ -71,7 +71,7 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    // --- MANEJO DE CICLO DE VIDA (Obligatorio para evitar errores) ---
+    //  MANEJO DE CICLO DE VIDA (Obligatorio para evitar errores) 
 
     @Override
     protected void onResume() {
@@ -84,4 +84,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onPause();
         drakoHelper.detener(); // Se pausa si el usuario sale o cambia de app
     }
+
+
+
 }

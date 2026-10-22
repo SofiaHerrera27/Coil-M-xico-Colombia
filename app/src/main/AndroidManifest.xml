@@ -35,8 +35,6 @@
 
         <activity android:name=".RegisterActivity" android:exported="false" />
         <activity android:name=".MainActivity" android:exported="false" />
-
-        <!-- 3. ACTIVIDAD DE LA CAZA DE COLORES (Obligatoria para navegar hacia ella) -->
         <activity android:name=".Acertijo_Caza_Colores" android:exported="false" />
 
     </application>
