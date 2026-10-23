@@ -14,16 +14,18 @@ El proyecto se gestiona mediante el marco de trabajo **Scrum/Kanban** integrado 
 ### Resumen del Product Backlog y Estimación
 | ID | Historia de Usuario | Story Points (SP) | Prioridad | Asignación Principales | Estado |
 | :--- | :--- | :---: | :---: | :--- | :--- |
-| HU-01 | Bienvenida con Drako | 2 SP | Alta 🔴 | Devs Colombia / UI | Done / In Progress |
-| HU-02a| Acertijo Caza de Colores | 3 SP | Alta 🔴 | Devs Colombia / Logic | In Progress |
-| HU-02b| Detección de Color (CameraX) | 5 SP | Alta 🔴 | Devs Colombia / Camera | In Progress |
-| HU-03 | Álbum de Personajes | 5 SP | Alta 🔴 | Devs Colombia / Data | Ready / Backlog |
-| HU-04 | Sistema de ParquePuntos | 5 SP | Alta 🔴 | Devs Colombia / State | Ready / Backlog |
-| HU-06 | Trivia de Cuidado Ambiental | 3 SP | Alta 🔴 | Devs Colombia / QA México| Backlog |
-| HU-05 | Canje Simulado de Premios | 3 SP | Media 🟡 | Devs Colombia / QA México| Backlog |
-| HU-08 | Tutorial Corto de Cámara | 2 SP | Media 🟡 | Devs Colombia / QA México| Backlog |
-| HU-07 | FAQ y Soporte con Drako | 3 SP | Baja 🟢 | Devs Colombia / QA México| Backlog |
-| **Total**| **Esfuerzo Estimado Total** | **31 SP** | | | |
+| HU-09 | Registro e Inicio de Sesión | 5 SP | Alta 🔴 | Devs México / Colombia | Done |
+| HU-01 | Bienvenida con Drako | 2 SP | Alta 🔴 | Devs Colombia / UI | In Progress (falta la voz) |
+| HU-02a | Acertijo Caza de Colores | 3 SP | Alta 🔴 | Devs Colombia / Logic | In Progress |
+| HU-02b | Detección de Color (ARCore) | 5 SP | Alta 🔴 | Devs Colombia / Camera | In Progress |
+| HU-03 | Álbum de Personajes | 5 SP | Alta 🔴 | Devs Colombia / Data | Backlog (por integrar) |
+| HU-04 | Sistema de ParquePuntos | 5 SP | Alta 🔴 | Devs Colombia / State | Backlog (por integrar) |
+| HU-06 | Trivia de Cuidado Ambiental | 3 SP | Alta 🔴 | Devs Colombia / QA México | In Progress |
+| HU-05 | Canje Simulado de Premios | 3 SP | Media 🟡 | Devs Colombia / QA México | Backlog |
+| HU-08 | Tutorial Corto de Cámara | 2 SP | Media 🟡 | Devs Colombia / QA México | Backlog |
+| HU-07 | FAQ y Soporte con Drako | 3 SP | Baja 🟢 | Devs Colombia / QA México | Backlog |
+| HU-10 | Voz de Drako | Por estimar | Media 🟡 | Equipo | Backlog |
+| **Total** | **Esfuerzo Estimado Total** | **36 SP** | | | |
 
 ---
 
