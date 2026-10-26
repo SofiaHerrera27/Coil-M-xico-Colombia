@@ -3,12 +3,15 @@ package com.joro.parquevivo;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.ImageView;
+import android.widget.TextView;
+import android.view.View;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
+
     private DrakoHelper drakoHelper;
 
     @Override
@@ -16,53 +19,131 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        String nombre = getIntent().getStringExtra("nombre");
         TextView tvBienvenida = findViewById(R.id.tvBienvenida);
-        tvBienvenida.setText("¡Bienvenido, " + nombre + "!");
+
+        String nombre = getIntent().getStringExtra("nombre");
+
+        if (tvBienvenida != null) {
+            if (nombre == null || nombre.trim().isEmpty()) {
+                tvBienvenida.setText("¡Bienvenido a ParqueVivo!");
+            } else {
+                tvBienvenida.setText("¡Bienvenido, " + nombre + "!");
+            }
+        }
+
         ImageView imgDrako = findViewById(R.id.imgDrako);
         TextView tvGlobo = findViewById(R.id.tvGlobo);
 
-        drakoHelper = new DrakoHelper(
-                this,
-                imgDrako,
-                tvGlobo,
-                DrakoHelper.TipoPantalla.INICIO
-        );
-        //Union o mejro dicho conexion de las secciones con las  acciones correspondientes.
-        findViewById(R.id.cardCaza).setOnClickListener(v ->
-                startActivity(new Intent(this, Acertijo_Caza_Colores.class)));
+        if (imgDrako != null && tvGlobo != null) {
+            drakoHelper = new DrakoHelper(
+                    this,
+                    imgDrako,
+                    tvGlobo,
+                    DrakoHelper.TipoPantalla.INICIO
+            );
+        }
 
-        findViewById(R.id.cardAlbum).setOnClickListener(v ->
-                drakoHelper.mostrarTextoEspecial("¡Tu álbum llegará muy pronto!"));
+        // Abrir Caza de Colores.
+        View cardCaza = findViewById(R.id.cardCaza);
 
-        findViewById(R.id.cardPuntos).setOnClickListener(v ->
-                drakoHelper.mostrarTextoEspecial("¡Pronto verás tus ParquePuntos aquí!"));
+        if (cardCaza != null) {
+            cardCaza.setOnClickListener(v -> {
+                Intent intent = new Intent(
+                        MainActivity.this,
+                        Acertijo_Caza_Colores.class
+                );
+                startActivity(intent);
+            });
+        }
 
-        findViewById(R.id.cardTrivia).setOnClickListener(v ->
-                drakoHelper.mostrarTextoEspecial("¡La trivia está en construcción!"));
+        // Mostrar el mensaje de Álbum.
+        View cardAlbum = findViewById(R.id.cardAlbum);
 
-        findViewById(R.id.cardPremios).setOnClickListener(v ->
-                drakoHelper.mostrarTextoEspecial("¡Los premios llegarán pronto!"));
+        if (cardAlbum != null) {
+            cardAlbum.setOnClickListener(v -> mostrarMensajeDrako(
+                    "¡Tu álbum llegará muy pronto!"
+            ));
+        }
 
+        // Abrir ParquePuntos.
+        View cardPuntos = findViewById(R.id.cardPuntos);
+
+        if (cardPuntos != null) {
+            cardPuntos.setOnClickListener(v -> {
+                Intent intent = new Intent(
+                        MainActivity.this,
+                        ParquePuntos.class
+                );
+                startActivity(intent);
+            });
+        }
+
+        // Mostrar el mensaje de Trivia.
+        View cardTrivia = findViewById(R.id.cardTrivia);
+
+        if (cardTrivia != null) {
+            cardTrivia.setOnClickListener(v -> mostrarMensajeDrako(
+                    "¡La trivia está en construcción!"
+            ));
+        }
+
+        // Abrir la pantalla de Premios.
+        View cardPremios = findViewById(R.id.cardPremios);
+
+        if (cardPremios != null) {
+            cardPremios.setOnClickListener(v -> {
+                Intent intent = new Intent(
+                        MainActivity.this,
+                        Premio.class
+                );
+                startActivity(intent);
+            });
+        }
+
+        // Cerrar sesión y regresar al inicio de sesión.
         Button btnSalir = findViewById(R.id.btnSalir);
-        btnSalir.setOnClickListener(v -> {
-            Intent intent = new Intent(this, LoginActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            finish();
-        });
+
+        if (btnSalir != null) {
+            btnSalir.setOnClickListener(v -> {
+                Intent intent = new Intent(
+                        MainActivity.this,
+                        LoginActivity.class
+                );
+
+                intent.setFlags(
+                        Intent.FLAG_ACTIVITY_NEW_TASK
+                                | Intent.FLAG_ACTIVITY_CLEAR_TASK
+                );
+
+                startActivity(intent);
+                finish();
+            });
+        }
+    }
+
+    private void mostrarMensajeDrako(String mensaje) {
+        if (drakoHelper != null) {
+            drakoHelper.mostrarTextoEspecial(mensaje);
+        } else {
+            Toast.makeText(this, mensaje, Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        drakoHelper.iniciar();   // muestra el mensaje y empieza a parpadear
+
+        if (drakoHelper != null) {
+            drakoHelper.iniciar();
+        }
     }
 
     @Override
     protected void onPause() {
-        super.onPause();
-        drakoHelper.detener();   // para el parpadeo al salir de la pantalla
-    }
+        if (drakoHelper != null) {
+            drakoHelper.detener();
+        }
 
+        super.onPause();
+    }
 }

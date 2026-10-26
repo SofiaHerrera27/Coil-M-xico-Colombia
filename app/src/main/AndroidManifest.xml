@@ -2,11 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- 1. PERMISOS DE CÁMARA (Obligatorios para CameraX) -->
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-feature android:name="android.hardware.camera" android:required="true" />
 
-    <!-- 2. SERVICIO DE VOZ TTS PARA DRAKO (Evita bloqueos de seguridad en Android 11+) -->
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="true" />
+
     <queries>
         <intent>
             <action android:name="android.intent.action.TTS_SERVICE" />
@@ -23,7 +24,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ParqueVivo">
 
-        <!-- Pantalla de inicio de la aplicación -->
         <activity
             android:name=".LoginActivity"
             android:exported="true">
@@ -33,9 +33,25 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".RegisterActivity" android:exported="false" />
-        <activity android:name=".MainActivity" android:exported="false" />
-        <activity android:name=".Acertijo_Caza_Colores" android:exported="false" />
+        <activity
+            android:name=".RegisterActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".Acertijo_Caza_Colores"
+            android:exported="false" />
+
+        <activity
+            android:name=".ParquePuntos"
+            android:exported="false" />
+
+        <activity
+            android:name=".Premio"
+            android:exported="false" />
 
     </application>
 
