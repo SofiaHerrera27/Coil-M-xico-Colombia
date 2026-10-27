@@ -10,6 +10,7 @@ public class ColorHuntController {
         void onColorVerified();
     }
 
+    private float[] centroColor;
     private float[] currentLowerHsv;
     private float[] currentUpperHsv;
     private boolean isScanningActive = false;
@@ -19,6 +20,10 @@ public class ColorHuntController {
     private static final int MAX_PROGRESS = 100;
     private static final int INCREMENT = 20; // Avance por cuadro detectado
     private static final int DECREMENT = 10; // Reducción si se pierde la toma
+
+    public float[] getCentroColor() {
+        return centroColor;
+    }
 
     public void setTargetColor(float[] lower, float[] upper, ColorDetectionListener listener) {
         this.currentLowerHsv = lower;
@@ -47,7 +52,7 @@ public class ColorHuntController {
             return;
         }
 
-        // Evalúa con la clase nativa
+        // Evalúa con la clase nativa si el color está en el centro
         boolean detected = NativeColorDetector.isColorInCenter(bitmap, currentLowerHsv, currentUpperHsv);
 
         if (detected) {
@@ -60,6 +65,8 @@ public class ColorHuntController {
             listener.onProgressUpdate(currentProgress);
 
             if (currentProgress >= MAX_PROGRESS) {
+                // Capturar las coordenadas del centro del color justo antes de notificar a la UI
+                centroColor = NativeColorDetector.findColorCenter(bitmap, currentLowerHsv, currentUpperHsv);
                 isScanningActive = false; // Detener escaneo al completar
                 listener.onColorVerified();
             }

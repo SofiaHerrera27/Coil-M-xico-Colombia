@@ -4,7 +4,9 @@
 
     <!-- 1. PERMISOS DE CÁMARA (Obligatorios para CameraX) -->
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-feature android:name="android.hardware.camera" android:required="true" />
+    <uses-feature android:name="android.hardware.camera" android:required="true"/>
+    <uses-feature android:name="android.hardware.camera.ar" android:required="false" />
+
 
     <!-- 2. SERVICIO DE VOZ TTS PARA DRAKO (Evita bloqueos de seguridad en Android 11+) -->
     <queries>
@@ -22,6 +24,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.ParqueVivo">
+
+        <meta-data android:name="com.google.ar.core" android:value="optional" />
 
         <!-- Pantalla de inicio de la aplicación -->
         <activity

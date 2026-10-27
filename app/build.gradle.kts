@@ -33,6 +33,8 @@ android {
 
 dependencies {
 
+    implementation("com.google.ar:core:1.48.0")
+
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)

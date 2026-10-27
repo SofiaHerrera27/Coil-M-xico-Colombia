@@ -6,6 +6,9 @@ package com.joro.parquevivo;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 public class NativeColorDetector {
+
+    public static String ultimoHsv = "";
+
 //Evalúa si el área central del Bitmap de la cámara contiene el color objetivo.
     public static boolean isColorInCenter(Bitmap bitmap, float[] lowerHsv, float[] upperHsv){
         // valida de seguridad
@@ -27,6 +30,10 @@ public class NativeColorDetector {
         int totalPixelsTested=0;//total pixeles evaluados en la muestra
 
         float[] pixelHsv =new float[3];
+
+        Color.colorToHSV(bitmap.getPixel(centerX, centerY), pixelHsv);
+        ultimoHsv = String.format("H=%.0f S=%.2f V=%.2f", pixelHsv[0], pixelHsv[1], pixelHsv[2]);
+
 
         // Bucle que recorre la región de interés (ROI) en el centro de la pantalla.
         // Se salta de a 4 píxeles (x += 4) para optimizar el rendimiento de la CPU.
@@ -52,6 +59,28 @@ public class NativeColorDetector {
         // Umbral de éxito: si más del 40% de los píxeles muestreados en el centro coinciden, la detección es VÁLIDA
         return totalPixelsTested > 0 && ((float) matchingPixels / totalPixelsTested) > 0.4f;
 
+    }
+
+    public static float[] findColorCenter(Bitmap bitmap, float[] lowerHsv, float[] upperHsv) {
+        if (bitmap == null || lowerHsv == null || upperHsv == null) return null;
+        int w = bitmap.getWidth(), h = bitmap.getHeight();
+        float[] hsv = new float[3];
+        long sumX = 0, sumY = 0;
+        int n = 0;
+
+        for (int x = 0; x < w; x += 8) {
+            for (int y = 0; y < h; y += 8) {
+                Color.colorToHSV(bitmap.getPixel(x, y), hsv);
+                if (isHsvInRange(hsv, lowerHsv, upperHsv)) {
+                    sumX += x;
+                    sumY += y;
+                    n++;
+                }
+            }
+        }
+
+        if (n < 10) return null;
+        return new float[]{ sumX / (float) n / w, sumY / (float) n / h };
     }
     private static boolean isHsvInRange(float[] hsv, float[] lower, float[] upper) {
         boolean hueMatch;

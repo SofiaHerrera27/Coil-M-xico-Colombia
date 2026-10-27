@@ -4,6 +4,8 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -32,26 +34,41 @@ import java.util.concurrent.Executors;
 
 public class Acertijo_Caza_Colores extends AppCompatActivity {
 
+    private ProgresoManager progreso;
+
+    // Control de ejecucion y tiempos
+    private final Handler handlerJuego = new Handler(Looper.getMainLooper());
+    private Runnable tareaHuida;
+    private volatile boolean procesandoFrame = false;
+    private static final long TIEMPO_HUIDA_MS = 12000;
     private static final int CAMERA_PERMISSION_CODE = 101;
+
+    // Parte A: Campos de anclaje por sensores
+    private AnclajeSensor anclajeSensor;
+    private final float[] rActual = new float[9];    // Ultima orientacion leida
+    private boolean tieneOrientacion = false;        // ¿Llegó al menos una lectura?
+    private boolean anclado = false;                 // ¿El personaje ya quedo fijo en el mundo?
+    private final float[] dirMundo = new float[3];   // Hacia donde "mira" el personaje en el mundo
+    private static final float FOV_VERTICAL_GRADOS = 60f; // Angulo de vision (ajustable)
+
+    // Componentes de interfaz
     private TextView tvAcertijo;
     private TextView tvEstadoEscaneo;
     private ProgressBar progressBarColor;
     private ImageView imgMariposa;
-
-    // Componentes visuales y controladores
     private PreviewView previewView;
+
+    // Controladores auxiliares
     private DrakoHelper drakoHelper;
     private ColorHuntController colorHuntController;
-
-    // Elementos del cuadro flotante de Drako
     private Button btnDrakoAccion;
 
-    // Control de progresión
+    // Control de progresion de acertijos
     private List<AcertijoColorModel> listaAcertijos;
     private int indiceActual = 0;
     private AcertijoColorModel acertijoActual;
 
-    // Estado del juego de persecución
+    // Estado del minijuego
     private boolean enPersecucion = false;
     private final Random random = new Random();
 
@@ -60,7 +77,7 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_acertijo_caza_colores);
 
-        // 1. Vincular componentes del layout
+        // 1. Vincular vistas del XML
         previewView = findViewById(R.id.previewView);
         tvAcertijo = findViewById(R.id.tvAcertijo);
         tvEstadoEscaneo = findViewById(R.id.tvEstadoEscaneo);
@@ -68,13 +85,11 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
         imgMariposa = findViewById(R.id.imgMariposaPersecucion);
 
         View drakoContainer = findViewById(R.id.layout_drako_container);
-
-        // Extraer vistas internas usando los IDs exactos del XML
         ImageView imgDrako = drakoContainer.findViewById(R.id.imgDrako);
         TextView tvGlobo = drakoContainer.findViewById(R.id.tvGlobo);
         btnDrakoAccion = drakoContainer.findViewById(R.id.btnDrakoAccion);
 
-        // 2. Inicializar controladores
+        // 2. Inicializar controladores y sensores (Parte A 3.2)
         drakoHelper = new DrakoHelper(
                 this,
                 imgDrako,
@@ -83,13 +98,17 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
         );
 
         colorHuntController = new ColorHuntController();
+        anclajeSensor = new AnclajeSensor(this);
 
-        // Click sobre la mariposa cuando aparezca
+        // Listener de toque para atrapar al Drako
         imgMariposa.setOnClickListener(v -> alAtraparMariposa());
 
-        // 3. Cargar acertijos y validar permiso de cámara
+        // 3. Cargar acertijos e iniciar
         cargarAcertijos();
         verificarPermisoCamara();
+
+
+        progreso = new ProgresoManager(this);
     }
 
     private void verificarPermisoCamara() {
@@ -131,7 +150,8 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
                 "ROJO",
                 ColorHSVUtils.getLowerHSV("ROJO"),
                 ColorHSVUtils.getUpperHSV("ROJO"),
-                "¡Gran agudeza visual! El ROJO desactiva la primera trampa del parque. +50 ParquePuntos."
+                "¡Gran agudeza visual! El ROJO abre un camino secreto del parque. +50 ParquePuntos.",
+                R.drawable.drako_rojo
         ));
         bancoRojo.add(new AcertijoColorModel(
                 1,
@@ -139,7 +159,8 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
                 "ROJO",
                 ColorHSVUtils.getLowerHSV("ROJO"),
                 ColorHSVUtils.getUpperHSV("ROJO"),
-                "¡Increíble deducción! El ROJO revela el camino secreto. +50 ParquePuntos."
+                "¡Increíble deducción! El ROJO revela el camino secreto. +50 ParquePuntos.",
+                R.drawable.drako_rojo
         ));
         listaAcertijos.add(bancoRojo.get(random.nextInt(bancoRojo.size())));
 
@@ -151,7 +172,8 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
                 "VERDE",
                 ColorHSVUtils.getLowerHSV("VERDE"),
                 ColorHSVUtils.getUpperHSV("VERDE"),
-                "¡Fabuloso! El VERDE demuestra tu conexión con la naturaleza. +50 ParquePuntos."
+                "¡Fabuloso! El VERDE demuestra tu conexión con la naturaleza. +50 ParquePuntos.",
+                R.drawable.drako_verde
         ));
         bancoVerde.add(new AcertijoColorModel(
                 2,
@@ -159,7 +181,8 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
                 "VERDE",
                 ColorHSVUtils.getLowerHSV("VERDE"),
                 ColorHSVUtils.getUpperHSV("VERDE"),
-                "¡Excelente! Has encontrado la esencia del color VERDE."
+                "¡Excelente! Has encontrado la esencia del color VERDE.",
+                R.drawable.drako_verde
         ));
         listaAcertijos.add(bancoVerde.get(random.nextInt(bancoVerde.size())));
 
@@ -171,7 +194,8 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
                 "AZUL",
                 ColorHSVUtils.getLowerHSV("AZUL"),
                 ColorHSVUtils.getUpperHSV("AZUL"),
-                "¡Perfecto! El AZUL ha restaurado la paz en la fuente del parque."
+                "¡Perfecto! El AZUL ha restaurado la paz en la fuente del parque.",
+                R.drawable.drako_azul
         ));
         bancoAzul.add(new AcertijoColorModel(
                 3,
@@ -179,7 +203,8 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
                 "AZUL",
                 ColorHSVUtils.getLowerHSV("AZUL"),
                 ColorHSVUtils.getUpperHSV("AZUL"),
-                "¡Fantástico! El AZUL activa el mecanismo acuático."
+                "¡Fantástico! El AZUL activa el mecanismo acuático.",
+                R.drawable.drako_azul
         ));
         listaAcertijos.add(bancoAzul.get(random.nextInt(bancoAzul.size())));
 
@@ -191,7 +216,8 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
                 "AMARILLO",
                 ColorHSVUtils.getLowerHSV("AMARILLO"),
                 ColorHSVUtils.getUpperHSV("AMARILLO"),
-                "¡MISIÓN CUMPLIDA! El AMARILLO ha iluminado todo el parque."
+                "¡Brillante! El AMARILLO ilumina un rincón del parque.",
+                R.drawable.drako_amarrillo
         ));
         bancoAmarillo.add(new AcertijoColorModel(
                 4,
@@ -199,7 +225,8 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
                 "AMARILLO",
                 ColorHSVUtils.getLowerHSV("AMARILLO"),
                 ColorHSVUtils.getUpperHSV("AMARILLO"),
-                "¡VICTORIA! Has desbloqueado el poder de la luz dorada."
+                "¡Espléndido! Has desbloqueado el poder de la luz dorada.",
+                R.drawable.drako_amarrillo
         ));
         listaAcertijos.add(bancoAmarillo.get(random.nextInt(bancoAmarillo.size())));
 
@@ -211,7 +238,8 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
                 "NARANJA",
                 ColorHSVUtils.getLowerHSV("NARANJA"),
                 ColorHSVUtils.getUpperHSV("NARANJA"),
-                "¡Excelente deducción! El NARANJA enciende la linterna mística de Drako. +50 ParquePuntos."
+                "¡Excelente deducción! El NARANJA enciende la linterna mística de Drako. +50 ParquePuntos.",
+                R.drawable.drako_naranja
         ));
         bancoNaranja.add(new AcertijoColorModel(
                 5,
@@ -219,7 +247,8 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
                 "NARANJA",
                 ColorHSVUtils.getLowerHSV("NARANJA"),
                 ColorHSVUtils.getUpperHSV("NARANJA"),
-                "¡Gran trabajo! El NARANJA ilumina el sendero oculto del parque."
+                "¡Gran trabajo! El NARANJA ilumina el sendero oculto del parque.",
+                R.drawable.drako_naranja
         ));
         listaAcertijos.add(bancoNaranja.get(random.nextInt(bancoNaranja.size())));
 
@@ -231,7 +260,8 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
                 "MORADO",
                 ColorHSVUtils.getLowerHSV("MORADO"),
                 ColorHSVUtils.getUpperHSV("MORADO"),
-                "¡Misterio resuelto! El MORADO revela el secreto de los árboles ancestrales. +50 ParquePuntos."
+                "¡Misterio resuelto! El MORADO revela el secreto de los árboles ancestrales. +50 ParquePuntos.",
+                R.drawable.drako_morado
         ));
         bancoMorado.add(new AcertijoColorModel(
                 6,
@@ -239,7 +269,8 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
                 "MORADO",
                 ColorHSVUtils.getLowerHSV("MORADO"),
                 ColorHSVUtils.getUpperHSV("MORADO"),
-                "¡Increíble! El MORADO ha desbloqueado la runa mágica."
+                "¡Increíble! El MORADO ha desbloqueado la runa mágica.",
+                R.drawable.drako_morado
         ));
         listaAcertijos.add(bancoMorado.get(random.nextInt(bancoMorado.size())));
 
@@ -251,7 +282,8 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
                 "ROSA",
                 ColorHSVUtils.getLowerHSV("ROSA"),
                 ColorHSVUtils.getUpperHSV("ROSA"),
-                "¡Sublime! El ROSA ha restaurado la armonía en el jardín del parque."
+                "¡Sublime! El ROSA ha restaurado la armonía en el jardín del parque.",
+                R.drawable.drako_rosa
         ));
         bancoRosa.add(new AcertijoColorModel(
                 7,
@@ -259,31 +291,33 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
                 "ROSA",
                 ColorHSVUtils.getLowerHSV("ROSA"),
                 ColorHSVUtils.getUpperHSV("ROSA"),
-                "¡VICTORIA TOTAL! Has completado todos los acertijos de la Caza de Colores."
+                "¡Genial! Has encontrado el ROSA del jardín.",
+                R.drawable.drako_rosa
         ));
         listaAcertijos.add(bancoRosa.get(random.nextInt(bancoRosa.size())));
 
-        // Mezcla el orden de presentación de los 7 colores de forma totalmente aleatoria
         Collections.shuffle(listaAcertijos);
     }
 
     private void mostrarAcertijoActual() {
-        drakoHelper.mostrarTextoEspecial("¡Lee el acertijo de arriba, explorador!");
+        handlerJuego.removeCallbacksAndMessages(null);
 
-        // Reiniciar elementos visuales de la ronda anterior
+        // Reiniciar estado de animacion y anclaje (Parte A 4.2)
         imgMariposa.setVisibility(View.GONE);
         imgMariposa.animate().cancel();
         enPersecucion = false;
+        anclado = false;
 
         if (progressBarColor != null) {
             progressBarColor.setVisibility(View.GONE);
             progressBarColor.setProgress(0);
         }
         if (tvEstadoEscaneo != null) {
-            tvEstadoEscaneo.setText("🔍 Presiona '¡Buscar Color!' para iniciar");
+            tvEstadoEscaneo.setText("Presiona '¡Buscar Color!' para iniciar");
         }
 
         if (indiceActual < listaAcertijos.size()) {
+            drakoHelper.mostrarTextoEspecial("¡Lee el acertijo de arriba, explorador!");
             acertijoActual = listaAcertijos.get(indiceActual);
             colorHuntController.setScanningActive(false);
 
@@ -297,7 +331,7 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
                             progressBarColor.setProgress(0);
                         }
                         if (tvEstadoEscaneo != null) {
-                            tvEstadoEscaneo.setText("🎯 Apunta el cuadro central hacia el color objetivo...");
+                            tvEstadoEscaneo.setText("Apunta el cuadro central hacia el color objetivo...");
                         }
 
                         colorHuntController.setTargetColor(
@@ -310,14 +344,11 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
                                             if (progressBarColor != null) {
                                                 progressBarColor.setProgress(progress);
                                             }
-                                            if (tvEstadoEscaneo != null) {
-                                                if (progress > 0) {
-                                                    // Se activa cuando la cámara empieza a ver el color correcto y llena la barra
-                                                    tvEstadoEscaneo.setText("¡Detectando color! Mantén fijo (" + progress + "%)");
-                                                } else {
-                                                    // Se muestra mientras aún no detecte nada
-                                                    tvEstadoEscaneo.setText("caza de colores iniciada vamos por el...shii...");
-                                                }
+
+                                            if (progress > 0 && !enPersecucion) {
+                                                tvEstadoEscaneo.setText("¡Detectando color! Mantén fijo (" + progress + "%)");
+                                            } else if (!enPersecucion) {
+                                                tvEstadoEscaneo.setText("Caza de colores iniciada, buscando...");
                                             }
                                         });
                                     }
@@ -333,7 +364,7 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
             );
         } else {
             actualizarInterfazDrako(
-                    "¡Has completado todos los acertijos de color del parque!",
+                    "VICTORIA TOTAL: ¡Has completado todos los acertijos de color del parque!",
                     "Finalizar",
                     v -> finish()
             );
@@ -341,26 +372,71 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
     }
 
     private void alDetectarColorExitoso() {
+        if (enPersecucion) return;
         colorHuntController.setScanningActive(false);
+        if (progressBarColor != null) progressBarColor.setVisibility(View.GONE);
 
-        if (progressBarColor != null) {
-            progressBarColor.setVisibility(View.GONE);
-        }
-        if (tvEstadoEscaneo != null) {
-            tvEstadoEscaneo.setText("🎉 ¡Color Verificado! ¡Atrapa a Drako!");
+        if (tvEstadoEscaneo != null && acertijoActual != null) {
+            tvEstadoEscaneo.setText("Shhh... algo se mueve dentro del "
+                    + acertijoActual.getColorNombre() + "...");
         }
 
-        // Iniciar minijuego de persecución
-        iniciarJuegoPersecucion();
+        handlerJuego.postDelayed(this::iniciarJuegoPersecucion, 800 + random.nextInt(2200));
     }
 
+    // Parte B3: Iniciar persecución naciendo desde el centro del color detectado
     private void iniciarJuegoPersecucion() {
         enPersecucion = true;
-        imgMariposa.setVisibility(View.VISIBLE);
-        imgMariposa.setScaleX(1.0f);
-        imgMariposa.setScaleY(1.0f);
 
-        animarMariposa();
+        if (acertijoActual != null && acertijoActual.getImagenPersonajeResId() != 0) {
+            imgMariposa.setImageResource(acertijoActual.getImagenPersonajeResId());
+        }
+
+        if (tvEstadoEscaneo != null) {
+            tvEstadoEscaneo.setText("¡Salió! ¡Tócalo antes de que huya!");
+        }
+
+        View raiz = findViewById(R.id.rootLayout);
+        if (raiz == null) raiz = previewView;
+
+        float[] c = colorHuntController.getCentroColor();
+        float cx = (c != null) ? c[0] * raiz.getWidth() : raiz.getWidth() / 2f;
+        float cy = (c != null) ? c[1] * raiz.getHeight() : raiz.getHeight() / 2f;
+
+        imgMariposa.setScaleX(0.2f);
+        imgMariposa.setScaleY(0.2f);
+        imgMariposa.setX(cx - mitadPersonaje());
+        imgMariposa.setY(cy - mitadPersonaje());
+        imgMariposa.setVisibility(View.VISIBLE);
+
+        imgMariposa.animate()
+                .scaleX(1f)
+                .scaleY(1f)
+                .setDuration(350)
+                .withEndAction(this::animarMariposa)
+                .start();
+
+        tareaHuida = this::drakoHuye;
+        handlerJuego.postDelayed(tareaHuida, TIEMPO_HUIDA_MS);
+    }
+
+    private void drakoHuye() {
+        if (!enPersecucion) return;
+        enPersecucion = false;
+        imgMariposa.animate().cancel();
+        imgMariposa.setVisibility(View.GONE);
+
+        if (tvEstadoEscaneo != null && acertijoActual != null) {
+            tvEstadoEscaneo.setText("¡Se escapó! Busca otro objeto "
+                    + acertijoActual.getColorNombre() + " para encontrarlo");
+        }
+
+        if (progressBarColor != null) {
+            progressBarColor.setProgress(0);
+            progressBarColor.setVisibility(View.VISIBLE);
+        }
+
+        colorHuntController.setScanningActive(true);
     }
 
     private void animarMariposa() {
@@ -369,11 +445,17 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
         View parentView = (View) imgMariposa.getParent();
         if (parentView == null) return;
 
+        int minY = 250;
+        View layoutEstado = findViewById(R.id.layoutEstadoBusqueda);
+        if (layoutEstado != null) {
+            minY = layoutEstado.getBottom() + 16;
+        }
+
         int maxX = Math.max(100, parentView.getWidth() - imgMariposa.getWidth() - 100);
-        int maxY = Math.max(200, parentView.getHeight() - imgMariposa.getHeight() - 300);
+        int maxY = Math.max(minY + 50, parentView.getHeight() - imgMariposa.getHeight() - 300);
 
         float nextX = random.nextInt(Math.max(1, maxX));
-        float nextY = random.nextInt(Math.max(1, maxY)) + 120; // Evitar la zona del texto superior
+        float nextY = minY + random.nextInt(Math.max(1, Math.max(1, maxY - minY)));
 
         imgMariposa.animate()
                 .x(nextX)
@@ -387,24 +469,99 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
                 .start();
     }
 
+    // Parte A 2.2: Métodos auxiliares de proyección
+    private float mitadPersonaje() {
+        return 45f * getResources().getDisplayMetrics().density; // La mitad de 90dp
+    }
+
+    private float focalPx() {
+        View raiz = findViewById(R.id.rootLayout);
+        float alto = (raiz != null && raiz.getHeight() > 0)
+                ? raiz.getHeight()
+                : getResources().getDisplayMetrics().heightPixels;
+        return (alto / 2f) / (float) Math.tan(Math.toRadians(FOV_VERTICAL_GRADOS / 2f));
+    }
+
+    // Parte A 2.3: Anclaje matemático de la pantalla al mundo
+    private void anclarPersonaje() {
+        if (!tieneOrientacion) return;
+
+        View raiz = findViewById(R.id.rootLayout);
+        if (raiz == null) raiz = previewView;
+
+        float f = focalPx();
+        float w = (raiz.getWidth() > 0) ? raiz.getWidth() : getResources().getDisplayMetrics().widthPixels;
+        float h = (raiz.getHeight() > 0) ? raiz.getHeight() : getResources().getDisplayMetrics().heightPixels;
+
+        float px = (imgMariposa.getX() + mitadPersonaje() - w / 2f) / f;
+        float py = (h / 2f - (imgMariposa.getY() + mitadPersonaje())) / f;
+
+        float[] r = rActual;
+        dirMundo[0] = r[0] * px + r[1] * py - r[2];
+        dirMundo[1] = r[3] * px + r[4] * py - r[5];
+        dirMundo[2] = r[6] * px + r[7] * py - r[8];
+
+        float n = (float) Math.sqrt(dirMundo[0] * dirMundo[0]
+                + dirMundo[1] * dirMundo[1] + dirMundo[2] * dirMundo[2]);
+
+        if (n > 0.0001f) {
+            for (int i = 0; i < 3; i++) dirMundo[i] /= n;
+            anclado = true;
+        }
+    }
+
+    // Parte A 3.1: Proyectar la posición 3D relativa a la orientación del celular
+    private void proyectarPersonaje() {
+        float[] r = rActual;
+        float dx = r[0] * dirMundo[0] + r[3] * dirMundo[1] + r[6] * dirMundo[2];
+        float dy = r[1] * dirMundo[0] + r[4] * dirMundo[1] + r[7] * dirMundo[2];
+        float profundidad = -(r[2] * dirMundo[0] + r[5] * dirMundo[1] + r[8] * dirMundo[2]);
+
+        if (profundidad < 0.1f) {
+            imgMariposa.setVisibility(View.INVISIBLE);
+            return;
+        }
+
+        View raiz = findViewById(R.id.rootLayout);
+        if (raiz == null) raiz = previewView;
+
+        float w = (raiz.getWidth() > 0) ? raiz.getWidth() : getResources().getDisplayMetrics().widthPixels;
+        float h = (raiz.getHeight() > 0) ? raiz.getHeight() : getResources().getDisplayMetrics().heightPixels;
+
+        float f = focalPx();
+        float x = w / 2f + f * (dx / profundidad);
+        float y = h / 2f - f * (dy / profundidad);
+
+        imgMariposa.setVisibility(View.VISIBLE);
+        imgMariposa.setX(x - mitadPersonaje());
+        imgMariposa.setY(y - mitadPersonaje());
+    }
+
+    // Parte A 4.1: Atrapado con disparo de anclaje
     private void alAtraparMariposa() {
         if (!enPersecucion) return;
-
         enPersecucion = false;
+
+        handlerJuego.removeCallbacks(tareaHuida);
         imgMariposa.animate().cancel();
 
-        // Efecto visual al tocar
-        imgMariposa.animate()
-                .scaleX(1.4f)
-                .scaleY(1.4f)
-                .alpha(0.5f)
-                .setDuration(300)
+        // Anclar dirección en el mundo
+        anclarPersonaje();
+
+        imgMariposa.animate().scaleX(1.3f).scaleY(1.3f).setDuration(250)
                 .withEndAction(() -> {
-                    imgMariposa.setVisibility(View.GONE);
-                    imgMariposa.setAlpha(1.0f);
+                    imgMariposa.animate().scaleX(1f).scaleY(1f).setDuration(150).start();
+                    if (tvEstadoEscaneo != null && acertijoActual != null) {
+                        tvEstadoEscaneo.setText(anclado
+                                ? "¡Atrapado! Gira el celular: Drako se queda ahí"
+                                : "¡Ya atrapaste a Drako " + acertijoActual.getColorNombre() + "!");
+                    }
+
+                    progreso.sumarPuntos(50);
+                    progreso.marcarCapturado(acertijoActual.getColorNombre());
+                    tvEstadoEscaneo.append("\n+50 ParquePuntos (total: " + progreso.getPuntos() + ")");
                     completarAcertijo();
-                })
-                .start();
+                }).start();
     }
 
     private void completarAcertijo() {
@@ -450,8 +607,8 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
                         .build();
 
                 imageAnalysis.setAnalyzer(Executors.newSingleThreadExecutor(), imageProxy -> {
-                    if (colorHuntController.isScanningActive()) {
-                        // Forzar la extracción del Bitmap de la vista en el Main Thread para evitar fallos de renderizado
+                    if (colorHuntController.isScanningActive() && !procesandoFrame) {
+                        procesandoFrame = true;
                         ContextCompat.getMainExecutor(this).execute(() -> {
                             if (colorHuntController.isScanningActive()) {
                                 Bitmap bitmap = previewView.getBitmap();
@@ -459,6 +616,7 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
                                     colorHuntController.processFrameBitmap(bitmap);
                                 }
                             }
+                            procesandoFrame = false;
                         });
                     }
                     imageProxy.close();
@@ -480,11 +638,29 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
         if (drakoHelper != null) {
             drakoHelper.iniciarSinSaludo();
         }
+
+        // Parte A 3.2: Iniciar escucha de sensores
+        if (anclajeSensor != null && anclajeSensor.disponible()) {
+            anclajeSensor.iniciar(r -> {
+                System.arraycopy(r, 0, rActual, 0, 9);
+                tieneOrientacion = true;
+                if (anclado) {
+                    runOnUiThread(this::proyectarPersonaje);
+                }
+            });
+        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        handlerJuego.removeCallbacksAndMessages(null);
+
+        // Parte A 3.2: Detener sensores
+        if (anclajeSensor != null) {
+            anclajeSensor.detener();
+        }
+
         if (drakoHelper != null) {
             drakoHelper.detener();
         }
