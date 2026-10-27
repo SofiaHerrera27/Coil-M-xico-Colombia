@@ -12,6 +12,10 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
+import android.view.animation.LinearInterpolator;
+import android.view.animation.OvershootInterpolator;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -35,6 +39,11 @@ import java.util.concurrent.Executors;
 public class Acertijo_Caza_Colores extends AppCompatActivity {
 
     private ProgresoManager progreso;
+    private View layoutTrofeo;
+    private ImageView imgTrofeo;
+    private TextView tvTrofeoNombre, tvTrofeoPuntos;
+    private ObjectAnimator giroTrofeo, flotarTrofeo;
+    private static final long DURACION_GIRO_MS = 5000;   // una vuelta completa; más alto = más lento
 
     // Control de ejecucion y tiempos
     private final Handler handlerJuego = new Handler(Looper.getMainLooper());
@@ -83,6 +92,14 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
         tvEstadoEscaneo = findViewById(R.id.tvEstadoEscaneo);
         progressBarColor = findViewById(R.id.progressBarColor);
         imgMariposa = findViewById(R.id.imgMariposaPersecucion);
+
+//para el mobimiento del personage trofeo
+        layoutTrofeo = findViewById(R.id.layoutTrofeo);
+        imgTrofeo = findViewById(R.id.imgTrofeo);
+        tvTrofeoNombre = findViewById(R.id.tvTrofeoNombre);
+        tvTrofeoPuntos = findViewById(R.id.tvTrofeoPuntos);
+        imgTrofeo.setOnClickListener(v ->
+                drakoHelper.mostrarTextoEspecial("¡victoria ahora si lo capturamso; ya puedes verlo en tu seccion Premios!"));
 
         View drakoContainer = findViewById(R.id.layout_drako_container);
         ImageView imgDrako = drakoContainer.findViewById(R.id.imgDrako);
@@ -301,6 +318,7 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
 
     private void mostrarAcertijoActual() {
         handlerJuego.removeCallbacksAndMessages(null);
+        ocultarTrofeo();
 
         // Reiniciar estado de animacion y anclaje (Parte A 4.2)
         imgMariposa.setVisibility(View.GONE);
@@ -341,6 +359,10 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
                                     @Override
                                     public void onProgressUpdate(int progress) {
                                         runOnUiThread(() -> {
+
+                                            //quitar al temrinar lo de Arcore y colores para que no ag aerrores
+                                            drakoHelper.mostrarTextoEspecial(NativeColorDetector.ultimoHsv);
+
                                             if (progressBarColor != null) {
                                                 progressBarColor.setProgress(progress);
                                             }
@@ -545,21 +567,17 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
         handlerJuego.removeCallbacks(tareaHuida);
         imgMariposa.animate().cancel();
 
-        // Anclar dirección en el mundo
-        anclarPersonaje();
-
         imgMariposa.animate().scaleX(1.3f).scaleY(1.3f).setDuration(250)
                 .withEndAction(() -> {
-                    imgMariposa.animate().scaleX(1f).scaleY(1f).setDuration(150).start();
-                    if (tvEstadoEscaneo != null && acertijoActual != null) {
-                        tvEstadoEscaneo.setText(anclado
-                                ? "¡Atrapado! Gira el celular: Drako se queda ahí"
-                                : "¡Ya atrapaste a Drako " + acertijoActual.getColorNombre() + "!");
-                    }
+                    imgMariposa.setVisibility(View.GONE);   // el personaje se convierte en trofeo
+                    imgMariposa.setScaleX(1f);
+                    imgMariposa.setScaleY(1f);
 
-                    progreso.sumarPuntos(50);
-                    progreso.marcarCapturado(acertijoActual.getColorNombre());
-                    tvEstadoEscaneo.append("\n+50 ParquePuntos (total: " + progreso.getPuntos() + ")");
+                    String color = acertijoActual.getColorNombre();
+                    boolean esNuevo = !progreso.estaCapturado(color);
+                    progreso.marcarCapturado(color);
+
+                    mostrarTrofeo(esNuevo);
                     completarAcertijo();
                 }).start();
     }
@@ -574,6 +592,55 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
                 }
         );
     }
+
+//inicialisacion de rotacion trancicion entre vueltas y manejo de estas
+    private void mostrarTrofeo(boolean esNuevo) {
+        String color = acertijoActual.getColorNombre();
+        imgTrofeo.setImageResource(acertijoActual.getImagenPersonajeResId());
+        Personaje p = Personaje.desdeColor(color);
+        tvTrofeoNombre.setText(p != null ? p.nombre : "Drako");
+        tvTrofeoPuntos.setText(esNuevo ? "+50 ParquePuntos" : "Ya estaba en tus premios");
+        layoutTrofeo.setVisibility(View.VISIBLE);
+
+        imgTrofeo.setScaleX(0f);
+        imgTrofeo.setScaleY(0f);
+        imgTrofeo.animate().scaleX(1f).scaleY(1f).setDuration(500)
+                .setInterpolator(new OvershootInterpolator()).start();
+
+        iniciarAnimacionesTrofeo();
+    }
+
+    private void iniciarAnimacionesTrofeo() {
+        float d = getResources().getDisplayMetrics().density;
+        imgTrofeo.setCameraDistance(8000f * d);
+        detenerAnimacionesTrofeo();
+
+        giroTrofeo = ObjectAnimator.ofFloat(imgTrofeo, View.ROTATION_Y, 0f, 360f);
+        giroTrofeo.setDuration(DURACION_GIRO_MS);
+        giroTrofeo.setInterpolator(new LinearInterpolator());
+        giroTrofeo.setRepeatCount(ValueAnimator.INFINITE);
+        giroTrofeo.start();
+
+        flotarTrofeo = ObjectAnimator.ofFloat(imgTrofeo, View.TRANSLATION_Y, 0f, -20f * d);
+        flotarTrofeo.setDuration(1600);
+        flotarTrofeo.setRepeatMode(ValueAnimator.REVERSE);
+        flotarTrofeo.setRepeatCount(ValueAnimator.INFINITE);
+        flotarTrofeo.start();
+    }
+
+    private void detenerAnimacionesTrofeo() {
+        if (giroTrofeo != null) giroTrofeo.cancel();
+        if (flotarTrofeo != null) flotarTrofeo.cancel();
+    }
+
+    private void ocultarTrofeo() {
+        detenerAnimacionesTrofeo();
+        imgTrofeo.animate().cancel();
+        imgTrofeo.setRotationY(0f);
+        imgTrofeo.setTranslationY(0f);
+        layoutTrofeo.setVisibility(View.GONE);
+    }
+
 
     private void actualizarInterfazDrako(String textoMensaje, String textoBoton, View.OnClickListener onClickListener) {
         if (tvAcertijo != null) {
@@ -649,11 +716,15 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
                 }
             });
         }
+        if (layoutTrofeo != null && layoutTrofeo.getVisibility() == View.VISIBLE) {
+            iniciarAnimacionesTrofeo();
+        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        detenerAnimacionesTrofeo();
         handlerJuego.removeCallbacksAndMessages(null);
 
         // Parte A 3.2: Detener sensores

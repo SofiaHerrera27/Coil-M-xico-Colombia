@@ -37,9 +37,11 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".PremiosActivity" android:exported="false" />
         <activity android:name=".RegisterActivity" android:exported="false" />
         <activity android:name=".MainActivity" android:exported="false" />
-        <activity android:name=".Acertijo_Caza_Colores" android:exported="false" />
+        <activity android:name=".Acertijo_Caza_Colores" android:exported="false"
+            android:screenOrientation="portrait" />
 
     </application>
 

@@ -30,6 +30,9 @@ public class ProgresoManager {
     public void marcarCapturado(String personajeId) {
         if (personajeId == null || personajeId.isEmpty()) return;
 
+        // para evitar el problema que tenia de sumar puntos y registrar doble si ya fue capturado previamente entonces evita sumar ds veces 50
+        if (estaCapturado(personajeId)) return;
+
         // 1. Desbloquea el cromo del personaje (ej: "desbloqueado_naranja" = true)
         prefs.edit().putBoolean(PREFIX_DESBLOQUEADO + personajeId.toLowerCase().trim(), true).apply();
 

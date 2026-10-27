@@ -58,7 +58,7 @@
             android:id="@+id/tvEstadoEscaneo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="🔍 Presiona '¡Buscar Color!' para iniciar"
+            android:text="Presiona '¡Buscar Color!' cuadnoe stes listo para inciar la caza de colorespara iniciar"
             android:textColor="#FFFFFF"
             android:textSize="14sp"
             android:textStyle="bold" />
@@ -85,6 +85,60 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
+    <LinearLayout
+        android:id="@+id/layoutTrofeo"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="#B3000000"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🏆 ¡TROFEO DESBLOQUEADO!"
+            android:textColor="#FFD54F"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/imgTrofeo"
+            android:layout_width="220dp"
+            android:layout_height="220dp"
+            android:layout_marginVertical="16dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/drako" />
+
+        <TextView
+            android:id="@+id/tvTrofeoNombre"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvTrofeoPuntos"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#FFD54F"
+            android:textSize="16sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Toca el trofeo para verlo en Premios"
+            android:textColor="#CCFFFFFF"
+            android:textSize="13sp" />
+    </LinearLayout>
     <!-- Drako flotante sobrepuesto en la parte inferior -->
     <include
         android:id="@+id/layout_drako_container"

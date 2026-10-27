@@ -57,6 +57,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         drakoHelper.iniciar();   // muestra el mensaje y empieza a parpadear
+        ProgresoManager progreso = new ProgresoManager(this);
+        TextView tvPuntosMenu = findViewById(R.id.cardPuntos); // Reemplaza por tu ID real
+        tvPuntosMenu.setText("Puntos: " + progreso.getPuntos());
     }
 
     @Override
