@@ -12,7 +12,9 @@ public class ProgresoManager {
     private final SharedPreferences prefs;
 
     public ProgresoManager(Context context) {
-        this.prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        // Se asegura de usar el contexto global de la aplicación
+        Context appCtx = context != null ? context.getApplicationContext() : context;
+        this.prefs = appCtx.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
     }
 
     /**
@@ -28,16 +30,17 @@ public class ProgresoManager {
      * Guarda el personaje como capturado y le otorga +50 ParquePuntos al usuario.
      */
     public void marcarCapturado(String personajeId) {
-        if (personajeId == null || personajeId.isEmpty()) return;
+        if (personajeId == null || personajeId.trim().isEmpty()) return;
 
-        // para evitar el problema que tenia de sumar puntos y registrar doble si ya fue capturado previamente entonces evita sumar ds veces 50
+        // Evita otorgar doble puntuación si ya fue registrado previamente
         if (estaCapturado(personajeId)) return;
 
-        // 1. Desbloquea el cromo del personaje (ej: "desbloqueado_naranja" = true)
-        prefs.edit().putBoolean(PREFIX_DESBLOQUEADO + personajeId.toLowerCase().trim(), true).apply();
-
-        // 2. Suma los 50 puntos
-        sumarPuntos(50);
+        // 1. Desbloquea el cromo del personaje (ej: "desbloqueado_rojo" = true)
+        // 2. Suma los 50 puntos correspondientes
+        prefs.edit()
+                .putBoolean(PREFIX_DESBLOQUEADO + personajeId.toLowerCase().trim(), true)
+                .putInt(KEY_PUNTOS, getPuntos() + 50)
+                .apply();
     }
 
     /**

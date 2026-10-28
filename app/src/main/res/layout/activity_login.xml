@@ -5,132 +5,143 @@
     android:background="@color/pv_fondo"
     android:fillViewport="true">
 
+    <!-- Imagen de Fondo Ilustrada: Esta es la nueva capa integrada -->
+    <ImageView
+        android:id="@+id/imgFondoLogin"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/fondo_parquevivo"
+        android:contentDescription="Fondo Ilustrado ParqueVivo" />
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true">
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="24dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="ParqueVivo"
-            android:textColor="@color/pv_verde_oscuro"
-            android:textSize="22sp"
-            android:textStyle="bold" />
-
-        <!-- Tarjeta de bienvenida de Drako -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:background="@color/pv_verde_oscuro"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:padding="20dp">
+            android:orientation="vertical"
+            android:padding="24dp">
 
-            <LinearLayout
-                android:layout_width="0dp"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
+                android:text="ParqueVivo"
+                android:textColor="@color/pv_verde_oscuro"
+                android:textSize="22sp"
+                android:textStyle="bold" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="¡Bienvenido!"
-                    android:textColor="#B7E4C7"
-                    android:textSize="12sp" />
+            <!-- Tarjeta de bienvenida de Drako -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:background="@color/pv_verde_oscuro"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="20dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:text="Inicia sesión para seguir descubriendo el parque con Drako."
-                    android:textColor="@color/pv_blanco"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="¡Bienvenido!"
+                        android:textColor="#B7E4C7"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="Inicia sesión para seguir descubriendo el parque con Drako."
+                        android:textColor="@color/pv_blanco"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <ImageView
+                    android:adjustViewBounds="true"
+                    android:contentDescription="Drako, toca para escuchar un consejo"
+                    android:id="@+id/logo"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_width="80dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/logo"/>
             </LinearLayout>
 
-            <ImageView
-                android:id="@+id/logo"
-                android:layout_width="80dp"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:adjustViewBounds="true"
-                android:contentDescription="Drako, toca para escuchar un consejo"
-                android:scaleType="fitCenter"
-                android:src="@drawable/logo" />
+                android:layout_marginTop="32dp"
+                android:text="Iniciar sesión"
+                android:textColor="@color/pv_texto"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/etEmail"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/bg_input"
+                android:hint="Correo electrónico"
+                android:inputType="textEmailAddress"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:textColor="@color/pv_texto"
+                android:textColorHint="@color/pv_texto_suave"
+                android:textSize="15sp" />
+
+            <EditText
+                android:id="@+id/etPassword"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_input"
+                android:hint="Contraseña"
+                android:inputType="textPassword"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:textColor="@color/pv_texto"
+                android:textColorHint="@color/pv_texto_suave"
+                android:textSize="15sp" />
+
+            <Button
+                android:id="@+id/btnLogin"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginTop="24dp"
+                android:text="Iniciar sesión"
+                android:textAllCaps="false"
+                android:textColor="@color/pv_blanco"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvIrRegistro"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="20dp"
+                android:gravity="center_vertical"
+                android:minHeight="48dp"
+                android:padding="8dp"
+                android:text="¿No tienes cuenta? Regístrate"
+                android:textColor="@color/pv_verde_oscuro"
+                android:textSize="14sp"
+                android:textStyle="bold" />
         </LinearLayout>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:text="Iniciar sesión"
-            android:textColor="@color/pv_texto"
-            android:textSize="24sp"
-            android:textStyle="bold" />
-
-        <EditText
-            android:id="@+id/etEmail"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/bg_input"
-            android:hint="Correo electrónico"
-            android:inputType="textEmailAddress"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:textColor="@color/pv_texto"
-            android:textColorHint="@color/pv_texto_suave"
-            android:textSize="15sp" />
-
-        <EditText
-            android:id="@+id/etPassword"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:layout_marginTop="12dp"
-            android:background="@drawable/bg_input"
-            android:hint="Contraseña"
-            android:inputType="textPassword"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:textColor="@color/pv_texto"
-            android:textColorHint="@color/pv_texto_suave"
-            android:textSize="15sp" />
-
-        <Button
-            android:id="@+id/btnLogin"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:layout_marginTop="24dp"
-            android:text="Iniciar sesión"
-            android:textAllCaps="false"
-            android:textColor="@color/pv_blanco"
-            android:textSize="16sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/tvIrRegistro"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="20dp"
-            android:gravity="center_vertical"
-            android:minHeight="48dp"
-            android:padding="8dp"
-            android:text="¿No tienes cuenta? Regístrate"
-            android:textColor="@color/pv_verde_oscuro"
-            android:textSize="14sp"
-            android:textStyle="bold" />
-    </LinearLayout>
     </ScrollView>
 
+    <!-- Componente flotante de Drako -->
     <include layout="@layout/layout_drako_flotante"/>
 
 </FrameLayout>

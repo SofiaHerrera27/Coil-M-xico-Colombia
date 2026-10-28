@@ -1,12 +1,22 @@
 package com.joro.parquevivo;
 
+/**
+ * Clase utilitaria para obtener los rangos umbral en espacio de color HSV
+ * (Hue: 0-360°, Saturation: 0-1, Value/Brightness: 0-1) para cada acertijo.
+ */
 public class ColorHSVUtils {
 
-    // Margen inferior de validacion (Hue 0-360, Sat 0-1, Val 0-1)
-    public static float[] getLowerHSV(String color) {
-        if (color == null) return new float[]{0f, 0f, 0f};
+    private ColorHSVUtils() {
+        // Constructor privado para evitar instanciación
+    }
 
-        switch (color.toUpperCase()) {
+    // Margen inferior de validación (Hue, Sat, Val)
+    public static float[] getLowerHSV(String color) {
+        if (color == null || color.trim().isEmpty()) {
+            return new float[]{0f, 0f, 0f};
+        }
+
+        switch (color.trim().toUpperCase()) {
             case "ROJO":
                 return new float[]{340f, 0.25f, 0.20f};
             case "VERDE":
@@ -26,11 +36,13 @@ public class ColorHSVUtils {
         }
     }
 
-    // Margen superior de validacion
+    // Margen superior de validación (Hue, Sat, Val)
     public static float[] getUpperHSV(String color) {
-        if (color == null) return new float[]{360f, 1.0f, 1.0f};
+        if (color == null || color.trim().isEmpty()) {
+            return new float[]{360f, 1.0f, 1.0f};
+        }
 
-        switch (color.toUpperCase()) {
+        switch (color.trim().toUpperCase()) {
             case "ROJO":
                 return new float[]{25f, 1.0f, 1.0f};
             case "VERDE":

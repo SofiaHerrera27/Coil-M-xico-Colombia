@@ -58,6 +58,7 @@ public class ColorHuntController {
         if (detected) {
             currentProgress = Math.min(MAX_PROGRESS, currentProgress + INCREMENT);
         } else {
+            // CORREGIDO: Se añadió el operador de resta (-)
             currentProgress = Math.max(0, currentProgress - DECREMENT);
         }
 

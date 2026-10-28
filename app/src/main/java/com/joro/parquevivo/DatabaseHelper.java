@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Base64;
 
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
 
@@ -17,7 +18,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TABLE = "usuarios";
 
     public DatabaseHelper(Context context) {
-        super(context, DB_NAME, null, DB_VERSION);
+        // Uso de getApplicationContext() para prevenir fugas de memoria del contexto
+        super(context != null ? context.getApplicationContext() : null, DB_NAME, null, DB_VERSION);
     }
 
     @Override
@@ -36,14 +38,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    /** Devuelve true si el usuario se creó; false si el correo ya existe. */
+    /** Devuelve true si el usuario se creó; false si el correo ya existe o los datos son inválidos. */
     public boolean registrarUsuario(String nombre, String email, String password) {
-        if (existeEmail(email)) return false;
+        if (nombre == null || email == null || password == null) return false;
+
+        String emailLimpio = email.trim().toLowerCase();
+        if (emailLimpio.isEmpty() || existeEmail(emailLimpio)) return false;
 
         String salt = generarSalt();
         ContentValues values = new ContentValues();
-        values.put("nombre", nombre);
-        values.put("email", email.toLowerCase());
+        values.put("nombre", nombre.trim());
+        values.put("email", emailLimpio);
         values.put("salt", salt);
         values.put("password_hash", hash(password, salt));
 
@@ -53,12 +58,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     /** Devuelve el nombre del usuario si las credenciales son correctas; null si no. */
     public String validarLogin(String email, String password) {
+        if (email == null || password == null) return null;
+
+        String emailLimpio = email.trim().toLowerCase();
         Cursor c = getReadableDatabase().query(TABLE,
                 new String[]{"nombre", "salt", "password_hash"},
-                "email = ?", new String[]{email.toLowerCase()},
+                "email = ?", new String[]{emailLimpio},
                 null, null, null);
+
         try {
-            if (c.moveToFirst()) {
+            if (c != null && c.moveToFirst()) {
                 String nombre = c.getString(0);
                 String salt = c.getString(1);
                 String guardado = c.getString(2);
@@ -68,15 +77,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             }
             return null;
         } finally {
-            c.close();
+            if (c != null) {
+                c.close();
+            }
         }
     }
 
     private boolean existeEmail(String email) {
+        if (email == null) return false;
+
         Cursor c = getReadableDatabase().query(TABLE, new String[]{"id"},
-                "email = ?", new String[]{email.toLowerCase()}, null, null, null);
-        boolean existe = c.getCount() > 0;
-        c.close();
+                "email = ?", new String[]{email.trim().toLowerCase()}, null, null, null);
+        boolean existe = false;
+        if (c != null) {
+            existe = c.getCount() > 0;
+            c.close();
+        }
         return existe;
     }
 
@@ -89,11 +105,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private String hash(String password, String salt) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
-            md.update(salt.getBytes("UTF-8"));
-            byte[] digest = md.digest(password.getBytes("UTF-8"));
+            md.update(salt.getBytes(StandardCharsets.UTF_8));
+            byte[] digest = md.digest(password.getBytes(StandardCharsets.UTF_8));
             return Base64.encodeToString(digest, Base64.NO_WRAP);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error al generar hash de contraseña", e);
         }
     }
 }

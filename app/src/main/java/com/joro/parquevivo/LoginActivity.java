@@ -18,16 +18,28 @@ public class LoginActivity extends AppCompatActivity {
     // Instancia del ayudante de Drako
     private DrakoHelper drakoHelper;
 
+    // Nuevo ImageView para el fondo de pantalla integrado
+    private ImageView imgLoginFondo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        // Inicialización global del sistema de sonido al abrir la aplicación
+        MusicaManager.init(this);
+
         db = new DatabaseHelper(this);
 
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
+
+        // Vincular el nuevo ImageView para el fondo integrado
+        imgLoginFondo = findViewById(R.id.imgFondoLogin);
+        if (imgLoginFondo != null) {
+            // Establecer la imagen de fondo generada
+            imgLoginFondo.setImageResource(R.drawable.fondo_parquevivo);
+        }
 
         // Obtener los elementos del layout flotante de Drako
         ImageView imgDrako = findViewById(R.id.imgDrako);
@@ -44,16 +56,19 @@ public class LoginActivity extends AppCompatActivity {
         Button btnLogin = findViewById(R.id.btnLogin);
         TextView tvIrRegistro = findViewById(R.id.tvIrRegistro);
 
-        btnLogin.setOnClickListener(v -> iniciarSesion());
+        if (btnLogin != null) {
+            btnLogin.setOnClickListener(v -> iniciarSesion());
+        }
 
-        tvIrRegistro.setOnClickListener(v ->
-                startActivity(new Intent(this, RegisterActivity.class)));
+        if (tvIrRegistro != null) {
+            tvIrRegistro.setOnClickListener(v ->
+                    startActivity(new Intent(this, RegisterActivity.class)));
+        }
     }
 
-
     private void iniciarSesion() {
-        String email = etEmail.getText().toString().trim();
-        String password = etPassword.getText().toString();
+        String email = (etEmail != null) ? etEmail.getText().toString().trim() : "";
+        String password = (etPassword != null) ? etPassword.getText().toString() : "";
 
         if (email.isEmpty() || password.isEmpty()) {
             Toast.makeText(this, "Ingresa correo y contraseña", Toast.LENGTH_SHORT).show();
@@ -71,20 +86,31 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    //  MANEJO DE CICLO DE VIDA (Obligatorio para evitar errores) 
+    // --- MANEJO DE CICLO DE VIDA Y RECURSOS DE AUDIO ---
 
     @Override
     protected void onResume() {
         super.onResume();
-        drakoHelper.iniciar(); // Empieza a parpadear
+        MusicaManager.reanudar(this, MusicaManager.Pista.AMBIENTE);
+        if (drakoHelper != null) {
+            drakoHelper.iniciar(); // Inicia voz y parpadeo de Drako
+        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        drakoHelper.detener(); // Se pausa si el usuario sale o cambia de app
+        MusicaManager.pausar();
+        if (drakoHelper != null) {
+            drakoHelper.detener(); // Pausa reproducción y animaciones activas
+        }
     }
 
-
-
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (drakoHelper != null) {
+            drakoHelper.liberar(); // Libera TextToSpeech al cerrar la vista
+        }
+    }
 }

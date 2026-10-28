@@ -1,30 +1,35 @@
 package com.joro.parquevivo;
-//integro acertijos para evitar sobrecargar la vista de la caza de colores
 
+/**
+ * Modelo de datos que representa cada acertijo de color, sus umbrales HSV
+ * y la criatura que se desbloquea al resolverlo.
+ */
 public class AcertijoColorModel {
-    private int id;//manejo de datos identificador en la DB
-    private String textoAcertijo;//Acertijo o pistas
-    private String colorNombre;
-    private float[] hsvLower; //limite superior
-    //para activar validacion en tiempo real y q nos de una margen de busqueda en ese caso la pantalla o lo q se ve
-    private float[] hsvUpper;//limite inferior
-    private String mensajeExito;
-    private int imagenPersonajeResId; // <--- Guardará la imagen específica de cada color
 
+    private final int id;
+    private final String textoAcertijo;
+    private final String colorNombre;
+    private final float[] hsvLower;
+    private final float[] hsvUpper;
+    private final String mensajeExito;
+    private final int imagenPersonajeResId;
 
-    //Metodo Contructor
-    public AcertijoColorModel(int id,String textoAcertijo, String colorNombre, float[] hsvLower, float[] hsvUpper, String mensajeExito, int imagenPersonajeResId) {
+    public AcertijoColorModel(int id,
+                              String textoAcertijo,
+                              String colorNombre,
+                              float[] hsvLower,
+                              float[] hsvUpper,
+                              String mensajeExito,
+                              int imagenPersonajeResId) {
         this.id = id;
         this.textoAcertijo = textoAcertijo;
         this.colorNombre = colorNombre;
-        this.hsvLower = hsvLower;
-        this.hsvUpper = hsvUpper;
+        this.hsvLower = (hsvLower != null) ? hsvLower.clone() : new float[]{0f, 0f, 0f};
+        this.hsvUpper = (hsvUpper != null) ? hsvUpper.clone() : new float[]{360f, 1f, 1f};
         this.mensajeExito = mensajeExito;
-        this.imagenPersonajeResId=imagenPersonajeResId;
+        this.imagenPersonajeResId = imagenPersonajeResId;
     }
 
-    //Metodo Getters
-    //solo para leer evitando q los modifiquen directamente alguien indeceado
     public int getId() {
         return id;
     }
@@ -38,15 +43,18 @@ public class AcertijoColorModel {
     }
 
     public float[] getHsvLower() {
-        return hsvLower;
+        return hsvLower.clone();
     }
 
     public float[] getHsvUpper() {
-        return hsvUpper;
+        return hsvUpper.clone();
     }
 
     public String getMensajeExito() {
         return mensajeExito;
     }
-    public int getImagenPersonajeResId() { return imagenPersonajeResId; }
+
+    public int getImagenPersonajeResId() {
+        return imagenPersonajeResId;
+    }
 }

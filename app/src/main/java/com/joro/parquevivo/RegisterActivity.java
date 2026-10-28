@@ -21,16 +21,20 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
+        // Garantizar inicialización del gestor de música
+        MusicaManager.init(this);
+
         db = new DatabaseHelper(this);
 
         etNombre = findViewById(R.id.etNombre);
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
         etConfirmar = findViewById(R.id.etConfirmar);
+
         Button btnRegistrar = findViewById(R.id.btnRegistrar);
         TextView tvIrLogin = findViewById(R.id.tvIrLogin);
 
-// Obtener los elementos del layout flotante de Drako
+        // Elementos del layout flotante de Drako
         ImageView imgDrako = findViewById(R.id.imgDrako);
         TextView tvGlobo = findViewById(R.id.tvGlobo);
 
@@ -41,31 +45,35 @@ public class RegisterActivity extends AppCompatActivity {
                 DrakoHelper.TipoPantalla.REGISTRO
         );
 
+        if (btnRegistrar != null) {
+            btnRegistrar.setOnClickListener(v -> registrar());
+        }
 
-        btnRegistrar.setOnClickListener(v -> registrar());
-        tvIrLogin.setOnClickListener(v -> finish());
+        if (tvIrLogin != null) {
+            tvIrLogin.setOnClickListener(v -> finish());
+        }
     }
 
     private void registrar() {
-        String nombre = etNombre.getText().toString().trim();
-        String email = etEmail.getText().toString().trim();
-        String password = etPassword.getText().toString();
-        String confirmar = etConfirmar.getText().toString();
+        String nombre = (etNombre != null) ? etNombre.getText().toString().trim() : "";
+        String email = (etEmail != null) ? etEmail.getText().toString().trim() : "";
+        String password = (etPassword != null) ? etPassword.getText().toString() : "";
+        String confirmar = (etConfirmar != null) ? etConfirmar.getText().toString() : "";
 
         if (nombre.isEmpty() || email.isEmpty() || password.isEmpty() || confirmar.isEmpty()) {
             Toast.makeText(this, "Completa todos los campos", Toast.LENGTH_SHORT).show();
             return;
         }
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            etEmail.setError("Correo no válido");
+            if (etEmail != null) etEmail.setError("Correo no válido");
             return;
         }
         if (password.length() < 6) {
-            etPassword.setError("Mínimo 6 caracteres");
+            if (etPassword != null) etPassword.setError("Mínimo 6 caracteres");
             return;
         }
         if (!password.equals(confirmar)) {
-            etConfirmar.setError("Las contraseñas no coinciden");
+            if (etConfirmar != null) etConfirmar.setError("Las contraseñas no coinciden");
             return;
         }
 
@@ -76,17 +84,32 @@ public class RegisterActivity extends AppCompatActivity {
             Toast.makeText(this, "Ese correo ya está registrado", Toast.LENGTH_SHORT).show();
         }
     }
-    // --- MANEJO DE CICLO DE VIDA (Obligatorio para evitar errores) ---
+
+    // --- MANEJO DE CICLO DE VIDA Y RECURSOS DE AUDIO ---
 
     @Override
     protected void onResume() {
         super.onResume();
-        drakoHelper.iniciar(); // Empieza a parpadear
+        MusicaManager.reanudar(this, MusicaManager.Pista.AMBIENTE);
+        if (drakoHelper != null) {
+            drakoHelper.iniciar(); // Inicia saludo y parpadeo de Drako
+        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        drakoHelper.detener(); // Se pausa si el usuario sale o cambia de app
+        MusicaManager.pausar();
+        if (drakoHelper != null) {
+            drakoHelper.detener(); // Cancela animaciones y audio activo
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (drakoHelper != null) {
+            drakoHelper.liberar(); // Cierra el motor de voz TextToSpeech de forma limpia
+        }
     }
 }

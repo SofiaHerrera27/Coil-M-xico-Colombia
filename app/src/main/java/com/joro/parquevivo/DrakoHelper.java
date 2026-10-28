@@ -2,28 +2,27 @@ package com.joro.parquevivo;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.media.MediaPlayer;
 import android.os.Handler;
 import android.os.Looper;
+import android.speech.tts.TextToSpeech;
+import android.speech.tts.UtteranceProgressListener;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import androidx.core.content.ContextCompat;
 
-// descomentar estos imports cuando activemos la voz de Drako
-// import android.animation.ObjectAnimator;
-// import android.animation.ValueAnimator;
-// import android.speech.tts.TextToSpeech;
-// import android.speech.tts.UtteranceProgressListener;
-// import java.util.Locale;
-
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 
-public class DrakoHelper {
+public class DrakoHelper implements TextToSpeech.OnInitListener {
 
-    // Pantallas principales de ParqueVivo
+    private MediaPlayer vozLocal;
+    private TextToSpeech tts;
+    private boolean ttsListo = false;
+
     public enum TipoPantalla {
         LOGIN,
         REGISTRO,
@@ -41,18 +40,10 @@ public class DrakoHelper {
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final Random random = new Random();
 
-    // Los 3 frames del parpadeo
     private final Drawable abierto;
     private final Drawable medio;
     private final Drawable cerrado;
 
-    // campos para la voz de Drako
-    // private TextToSpeech tts;
-    // private boolean ttsListo = false;
-    // private boolean vozActivada = true;      // Luego se guarda en SharedPreferences
-    // private ObjectAnimator animacionHabla;
-
-    // Guarda qué mensaje le toca mostrar a Drako en cada pantalla
     private static final Map<TipoPantalla, Integer> indicesMensajes = new HashMap<>();
 
     public DrakoHelper(Context context,
@@ -65,7 +56,6 @@ public class DrakoHelper {
         this.tvGlobo = tvGlobo;
         this.tipoPantalla = tipoPantalla;
 
-        // Imágenes necesarias para el parpadeo
         abierto = ContextCompat.getDrawable(context, R.drawable.drako);
         medio = ContextCompat.getDrawable(context, R.drawable.drako_medio);
         cerrado = ContextCompat.getDrawable(context, R.drawable.drako_cerrado);
@@ -74,44 +64,56 @@ public class DrakoHelper {
             indicesMensajes.put(tipoPantalla, 0);
         }
 
-        // Al tocar a Drako, mostrar el consejo en su propio globo
         if (this.imgDrako != null) {
             this.imgDrako.setOnClickListener(v -> darConsejoOSaludo());
         }
 
-        //iniciar motor de voz
-        /*
-        tts = new TextToSpeech(context.getApplicationContext(), status -> {
-            if (status == TextToSpeech.SUCCESS) {
-                int r = tts.setLanguage(new Locale("es", "CO"));
-                if (r == TextToSpeech.LANG_MISSING_DATA || r == TextToSpeech.LANG_NOT_SUPPORTED) {
-                    r = tts.setLanguage(new Locale("es", "ES"));
-                }
-                // Si no hay voz en español instalada, Drako queda mudo (sin errores)
-                ttsListo = (r != TextToSpeech.LANG_MISSING_DATA
-                        && r != TextToSpeech.LANG_NOT_SUPPORTED);
-                tts.setPitch(1.4f);        // Voz más aguda de dragoncito
-                tts.setSpeechRate(0.95f);  // Un poco más lento
-                tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
-                    @Override public void onStart(String id) {
-                        if (imgDrako != null) imgDrako.post(() -> empezarAnimacionHabla());
-                    }
-                    @Override public void onDone(String id) {
-                        if (imgDrako != null) imgDrako.post(() -> detenerAnimacionHabla());
-                    }
-                    @Override public void onError(String id) {
-                        if (imgDrako != null) imgDrako.post(() -> detenerAnimacionHabla());
-                    }
-                });
-            }
-        });
-        */
+        // Inicializar motor de voz TTS
+        tts = new TextToSpeech(context.getApplicationContext(), this);
     }
 
+    @Override
+    public void onInit(int status) {
+        if (status == TextToSpeech.SUCCESS) {
+            int result = tts.setLanguage(new Locale("es", "CO"));
+            if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                result = tts.setLanguage(new Locale("es", "ES"));
+            }
+
+            if (result != TextToSpeech.LANG_MISSING_DATA && result != TextToSpeech.LANG_NOT_SUPPORTED) {
+                ttsListo = true;
+                tts.setPitch(1.35f);       // Tono más agudo para voz de dragoncito
+                tts.setSpeechRate(0.95f);   // Velocidad cómoda de lectura
+
+                tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+                    @Override
+                    public void onStart(String utteranceId) {
+                        MusicaManager.bajarVolumen();
+                    }
+
+                    @Override
+                    public void onDone(String utteranceId) {
+                        MusicaManager.subirVolumen();
+                    }
+
+                    @Override
+                    public void onError(String utteranceId) {
+                        MusicaManager.subirVolumen();
+                    }
+                });
+
+                // Reproduce el texto del globo que ya estaba visible al abrir la pantalla
+                if (tvGlobo != null && tvGlobo.getVisibility() == View.VISIBLE) {
+                    String textoInicial = tvGlobo.getText().toString();
+                    if (!textoInicial.isEmpty()) {
+                        handler.post(() -> hablar(textoInicial));
+                    }
+                }
+            }
+        }
+    }
 
     // PARPADEO
-
-    // Secuencia: medio -> cerrado -> medio -> abierto (unos 170 ms en total)
     private void parpadear(int paso) {
         Drawable[] frames = {medio, cerrado, medio, abierto};
         long[] pausas = {50, 70, 50};
@@ -120,21 +122,20 @@ public class DrakoHelper {
 
         imgDrako.setImageDrawable(frames[paso]);
 
-        if (paso < frames.length - 1) { // Corregido error sintáctico (- 1)
+        if (paso < frames.length - 1) { // CORREGIDO: Se agregó el operador '- 1'
             handler.postDelayed(() -> parpadear(paso + 1), pausas[paso]);
         } else {
             programarSiguiente();
         }
     }
 
-    // Espera entre 2.5 y 6 segundos antes del siguiente parpadeo
     private void programarSiguiente() {
         handler.postDelayed(() -> parpadear(0), random.nextInt(3500) + 2500);
     }
 
     public void iniciar() {
-        handler.removeCallbacksAndMessages(null); // Cancela cualquier parpadeo pendiente
-        darConsejoOSaludo(); // Muestra la burbuja inicial al arrancar
+        handler.removeCallbacksAndMessages(null);
+        darConsejoOSaludo();
         handler.postDelayed(() -> parpadear(0), 1500);
     }
 
@@ -144,66 +145,59 @@ public class DrakoHelper {
     }
 
     public void detener() {
+        detenerVoz();
         handler.removeCallbacksAndMessages(null);
         if (imgDrako != null && abierto != null) {
-            imgDrako.setImageDrawable(abierto); // Que no quede con los ojos cerrados al salir
+            imgDrako.setImageDrawable(abierto);
         }
-
-        //cortar la voz y la animación al salir de la pantalla
-        // if (tts != null) tts.stop();
-        // detenerAnimacionHabla();
     }
 
-    //liberar el motor de voz; llamarlo desde onDestroy() en la Activity
-    /*
-    public void liberar() {
-        if (tts != null) {
+    // Método para leer cualquier texto mediante TTS
+    public void hablar(String texto) {
+        detenerVoz();
+        if (texto == null || texto.trim().isEmpty()) return;
+
+        if (ttsListo && tts != null) {
+            // Quita emojis y símbolos que interrumplan la lectura
+            String textoLimpio = texto.replaceAll("[^\\p{L}\\p{N}\\p{P}\\p{Z}]", "").trim();
+            tts.speak(textoLimpio, TextToSpeech.QUEUE_FLUSH, null, "drako_speech");
+        }
+    }
+
+    // Permite reproducir audios grabados manualmente de res/raw/
+    public void reproducirVozLocal(int rawId) {
+        detenerVoz();
+        if (rawId == 0) return;
+        vozLocal = MediaPlayer.create(context, rawId);
+        if (vozLocal == null) return;
+        MusicaManager.bajarVolumen();
+        vozLocal.setOnCompletionListener(mp -> detenerVoz());
+        vozLocal.start();
+    }
+
+    private void detenerVoz() {
+        if (tts != null && tts.isSpeaking()) {
             tts.stop();
+        }
+        if (vozLocal != null) {
+            try {
+                if (vozLocal.isPlaying()) vozLocal.stop();
+                vozLocal.release();
+            } catch (Exception ignored) {}
+            vozLocal = null;
+        }
+        MusicaManager.subirVolumen();
+    }
+
+    public void liberar() {
+        detenerVoz();
+        if (tts != null) {
             tts.shutdown();
             tts = null;
         }
     }
-    */
-
-
-    // leer el mensaje en voz alta
-    /*
-    private void hablar(String texto) {
-        if (!vozActivada || !ttsListo || tts == null) return;
-
-        // Quita los emojis: muchos motores de voz los leen como palabras
-        String limpio = texto.replaceAll("[^\\p{L}\\p{N}\\p{P}\\p{Z}]", "").trim();
-
-        // QUEUE_FLUSH corta lo anterior si el niño toca varias veces seguidas
-        tts.speak(limpio, TextToSpeech.QUEUE_FLUSH, null, "drako");
-    }
-    */
-
-    //Rebote: Drako rebota suavemente mientras habla (no necesita imágenes extra)
-    /*
-    private void empezarAnimacionHabla() {
-        detenerAnimacionHabla();
-        if (imgDrako == null) return;
-        imgDrako.setPivotY(imgDrako.getHeight()); // Rebota desde los pies
-        animacionHabla = ObjectAnimator.ofFloat(imgDrako, "scaleY", 1f, 1.04f);
-        animacionHabla.setDuration(250);
-        animacionHabla.setRepeatMode(ValueAnimator.REVERSE);
-        animacionHabla.setRepeatCount(ValueAnimator.INFINITE);
-        animacionHabla.start();
-    }
-
-    private void detenerAnimacionHabla() {
-        if (animacionHabla != null) {
-            animacionHabla.cancel();
-            animacionHabla = null;
-        }
-        if (imgDrako != null) imgDrako.setScaleY(1f);
-    }
-    */
-//por ultimo integrarlo en el manifests
 
     // MENSAJES
-
     private String[] obtenerMensajes() {
         switch (tipoPantalla) {
             case LOGIN:
@@ -220,7 +214,6 @@ public class DrakoHelper {
                         "Tu contraseña debe tener al menos 6 caracteres. ¡Que sea secreta!",
                         "Repite la contraseña para confirmarla y listo."
                 };
-
             case INICIO:
                 return new String[]{
                         "¡Bienvenido a ParqueVivo! Elige una actividad para empezar.",
@@ -229,7 +222,6 @@ public class DrakoHelper {
                         "¡Revisa tus ParquePuntos arriba para ver tu nivel actual!",
                         "¡Caminar y explorar el parque suma experiencia para tus logros!"
                 };
-
             case CAZA_COLORES:
                 return new String[]{
                         "¡Lee con atención el acertijo para descubrir el color oculto!",
@@ -238,7 +230,6 @@ public class DrakoHelper {
                         "¡Si no aciertas a la tercera, te daré una pista directa!",
                         "¡Cada color desbloquea una criatura única en tu Álbum!"
                 };
-
             case ALBUM:
                 return new String[]{
                         "¡Aquí están todas las criaturas que has atrapado en el parque!",
@@ -246,7 +237,6 @@ public class DrakoHelper {
                         "¡Vuelve a la Caza de Colores para completar toda tu colección!",
                         "Cada criatura representa un elemento especial de la naturaleza."
                 };
-
             case TRIVIA:
                 return new String[]{
                         "¡Demuestra que eres un gran Guardián del Parque!",
@@ -254,7 +244,6 @@ public class DrakoHelper {
                         "Lee bien cada pregunta antes de seleccionar la respuesta.",
                         "¡Aprender sobre naturaleza ayuda a proteger nuestro planeta!"
                 };
-
             case PREMIOS:
                 return new String[]{
                         "¡Mira todas las recompensas que puedes canjear con tus puntos!",
@@ -262,7 +251,6 @@ public class DrakoHelper {
                         "¡Muéstrale a tus amigos y familia todos tus logros en el parque!",
                         "¡Alcanzar niveles altos desbloquea medallas especiales!"
                 };
-
             default:
                 return new String[]{"¡Hola! Soy Drako, tu guía en ParqueVivo."};
         }
@@ -276,21 +264,20 @@ public class DrakoHelper {
 
         String textoAMostrar = mensajes[indexActual];
 
-        // Mostrar el consejo dentro del globo flotante
         tvGlobo.setText(textoAMostrar);
         tvGlobo.setVisibility(View.VISIBLE);
 
-        // activar este llamada para poner hablar automáticamente faltan audios:
-        // hablar(textoAMostrar);
+        hablar(textoAMostrar);
 
-        // Preparar el siguiente mensaje para el próximo toque
         int siguienteIndex = (indexActual + 1) % mensajes.length;
         indicesMensajes.put(tipoPantalla, siguienteIndex);
     }
+
     public void mostrarTextoEspecial(String texto) {
         if (tvGlobo != null) {
             tvGlobo.setText(texto);
             tvGlobo.setVisibility(View.VISIBLE);
+            hablar(texto);
         }
     }
 }

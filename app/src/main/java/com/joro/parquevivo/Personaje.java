@@ -1,5 +1,9 @@
 package com.joro.parquevivo;
-//para facilitar la coneccion y envio de imagens o paerosonages al album o al asecion de premios
+
+/**
+ * Enum que vincula cada color de los acertijos con su respectivo personaje Drako
+ * y su recurso gráfico en res/drawable.
+ */
 public enum Personaje {
     ROJO("Drako Rojo", R.drawable.drako_rojo),
     VERDE("Drako Verde", R.drawable.drako_verde),
@@ -17,9 +21,27 @@ public enum Personaje {
         this.imagenResId = imagenResId;
     }
 
+    public String getNombre() {
+        return nombre;
+    }
+
+    public int getImagenResId() {
+        return imagenResId;
+    }
+
+    /**
+     * Busca y retorna la instancia del Personaje correspondiente al nombre del color.
+     */
     public static Personaje desdeColor(String color) {
+        if (color == null || color.trim().isEmpty()) {
+            return null;
+        }
+
+        String colorLimpio = color.trim();
         for (Personaje p : values()) {
-            if (p.name().equalsIgnoreCase(color)) return p;
+            if (p.name().equalsIgnoreCase(colorLimpio)) {
+                return p;
+            }
         }
         return null;
     }

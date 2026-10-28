@@ -17,7 +17,14 @@ public class AnclajeSensor {
     private SensorEventListener sensorEventListener;
 
     public AnclajeSensor(Context context) {
-        sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+        // Uso de getApplicationContext() para evitar fugas de memoria con el contexto de la Activity
+        Context appCtx = (context != null) ? context.getApplicationContext() : context;
+        if (appCtx != null) {
+            sensorManager = (SensorManager) appCtx.getSystemService(Context.SENSOR_SERVICE);
+        } else {
+            sensorManager = null;
+        }
+
         if (sensorManager != null) {
             sensorRotacion = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
         } else {
@@ -33,6 +40,9 @@ public class AnclajeSensor {
     // Inicia la lectura de los sensores
     public void iniciar(ListenerOrientacion listener) {
         if (!disponible() || listener == null) return;
+
+        // Asegura desregistrar cualquier listener previo antes de crear uno nuevo
+        detener();
 
         sensorEventListener = new SensorEventListener() {
             private final float[] matrizRotacion = new float[9];

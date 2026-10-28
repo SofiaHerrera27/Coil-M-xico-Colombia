@@ -3,6 +3,7 @@ package com.joro.parquevivo;
 import android.Manifest;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -88,6 +89,8 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_acertijo_caza_colores);
 
+        // Inicializar gestor de sonido y contexto global
+        MusicaManager.init(this);
         progreso = new ProgresoManager(this);
 
         imgMoneda = findViewById(R.id.imgMoneda);
@@ -107,8 +110,10 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
         imgTrofeo = findViewById(R.id.imgTrofeo);
         tvTrofeoNombre = findViewById(R.id.tvTrofeoNombre);
         tvTrofeoPuntos = findViewById(R.id.tvTrofeoPuntos);
+
+        // Navegación directa a la pantalla de Premios al tocar el trofeo
         imgTrofeo.setOnClickListener(v ->
-                drakoHelper.mostrarTextoEspecial("¡Victoria! ¡Ahora sí lo capturamos, ya puedes verlo en tu sección Premios!"));
+                startActivity(new Intent(this, PremiosActivity.class)));
 
         View drakoContainer = findViewById(R.id.layout_drako_container);
         ImageView imgDrako = drakoContainer.findViewById(R.id.imgDrako);
@@ -708,9 +713,21 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
                         procesandoFrame = true;
                         ContextCompat.getMainExecutor(this).execute(() -> {
                             if (colorHuntController.isScanningActive()) {
-                                Bitmap bitmap = previewView.getBitmap();
-                                if (bitmap != null) {
-                                    colorHuntController.processFrameBitmap(bitmap);
+                                Bitmap bitmapCompleto = previewView.getBitmap();
+                                if (bitmapCompleto != null) {
+                                    // Extraer únicamente el 35% central de la pantalla
+                                    int width = bitmapCompleto.getWidth();
+                                    int height = bitmapCompleto.getHeight();
+                                    int cropWidth = (int) (width * 0.35f);
+                                    int cropHeight = (int) (height * 0.35f);
+                                    int startX = (width - cropWidth) / 2;
+                                    int startY = (height - cropHeight) / 2;
+
+                                    Bitmap recuadroCentro = Bitmap.createBitmap(
+                                            bitmapCompleto, startX, startY, cropWidth, cropHeight
+                                    );
+
+                                    colorHuntController.processFrameBitmap(recuadroCentro);
                                 }
                             }
                             procesandoFrame = false;
@@ -732,7 +749,7 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        MusicaManager.cambiarPista(MusicaManager.Pista.ACERTIJO);
+        MusicaManager.reanudar(this, MusicaManager.Pista.ACERTIJO);
         if (drakoHelper != null) {
             drakoHelper.iniciarSinSaludo();
         }
@@ -755,11 +772,23 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+        MusicaManager.pausar();
+        if (drakoHelper != null) {
+            drakoHelper.detener();
+        }
         detenerAnimacionesTrofeo();
         handlerJuego.removeCallbacksAndMessages(null);
 
         if (anclajeSensor != null) {
             anclajeSensor.detener();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (drakoHelper != null) {
+            drakoHelper.liberar();
         }
     }
 }
