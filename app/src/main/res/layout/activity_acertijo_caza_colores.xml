@@ -58,7 +58,7 @@
             android:id="@+id/tvEstadoEscaneo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Presiona '¡Buscar Color!' cuadnoe stes listo para inciar la caza de colorespara iniciar"
+            android:text="Presiona '¡Buscar Color!' cuando estés listo para iniciar la caza de colores"
             android:textColor="#FFFFFF"
             android:textSize="14sp"
             android:textStyle="bold" />
@@ -85,6 +85,20 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
+    <!-- Moneda Sorpresa flutuante sobre la mira central -->
+    <ImageView
+        android:id="@+id/imgMoneda"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@drawable/ic_moneda"
+        android:visibility="gone"
+        android:elevation="8dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="@id/viewTargetCenter"
+        app:layout_constraintTop_toTopOf="@id/viewTargetCenter"
+        android:contentDescription="Moneda Sorpresa" />
+
     <LinearLayout
         android:id="@+id/layoutTrofeo"
         android:layout_width="0dp"
@@ -103,7 +117,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="🏆 ¡TROFEO DESBLOQUEADO!"
+            android:text=" ¡TROFEO DESBLOQUEADO!"
             android:textColor="#FFD54F"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -139,6 +153,7 @@
             android:textColor="#CCFFFFFF"
             android:textSize="13sp" />
     </LinearLayout>
+
     <!-- Drako flotante sobrepuesto en la parte inferior -->
     <include
         android:id="@+id/layout_drako_container"

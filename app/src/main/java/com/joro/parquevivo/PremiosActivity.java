@@ -60,4 +60,9 @@ public class PremiosActivity extends AppCompatActivity {
 
         ((Button) findViewById(R.id.btnVolverPremios)).setOnClickListener(v -> finish());
     }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        MusicaManager.cambiarPista(MusicaManager.Pista.AMBIENTE);
+    }
 }

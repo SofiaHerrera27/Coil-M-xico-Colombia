@@ -1,21 +1,21 @@
 package com.joro.parquevivo;
 
 import android.Manifest;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
+import android.view.animation.LinearInterpolator;
+import android.view.animation.OvershootInterpolator;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
-import android.view.animation.LinearInterpolator;
-import android.view.animation.OvershootInterpolator;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -43,10 +43,12 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
     private ImageView imgTrofeo;
     private TextView tvTrofeoNombre, tvTrofeoPuntos;
     private ObjectAnimator giroTrofeo, flotarTrofeo;
-    private static final long DURACION_GIRO_MS = 5000;   // una vuelta completa; más alto = más lento
+    private static final long DURACION_GIRO_MS = 5000;
 
     // Control de ejecucion y tiempos
     private final Handler handlerJuego = new Handler(Looper.getMainLooper());
+    private boolean monedaDisponible = false;
+    private View imgMoneda;
     private Runnable tareaHuida;
     private volatile boolean procesandoFrame = false;
     private static final long TIEMPO_HUIDA_MS = 12000;
@@ -54,11 +56,11 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
 
     // Parte A: Campos de anclaje por sensores
     private AnclajeSensor anclajeSensor;
-    private final float[] rActual = new float[9];    // Ultima orientacion leida
-    private boolean tieneOrientacion = false;        // ¿Llegó al menos una lectura?
-    private boolean anclado = false;                 // ¿El personaje ya quedo fijo en el mundo?
-    private final float[] dirMundo = new float[3];   // Hacia donde "mira" el personaje en el mundo
-    private static final float FOV_VERTICAL_GRADOS = 60f; // Angulo de vision (ajustable)
+    private final float[] rActual = new float[9];
+    private boolean tieneOrientacion = false;
+    private boolean anclado = false;
+    private final float[] dirMundo = new float[3];
+    private static final float FOV_VERTICAL_GRADOS = 60f;
 
     // Componentes de interfaz
     private TextView tvAcertijo;
@@ -86,6 +88,13 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_acertijo_caza_colores);
 
+        progreso = new ProgresoManager(this);
+
+        imgMoneda = findViewById(R.id.imgMoneda);
+        if (imgMoneda != null) {
+            imgMoneda.setOnClickListener(v -> recolectarMonedaSorpresa());
+        }
+
         // 1. Vincular vistas del XML
         previewView = findViewById(R.id.previewView);
         tvAcertijo = findViewById(R.id.tvAcertijo);
@@ -93,20 +102,20 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
         progressBarColor = findViewById(R.id.progressBarColor);
         imgMariposa = findViewById(R.id.imgMariposaPersecucion);
 
-//para el mobimiento del personage trofeo
+        // Vistas para la animación del trofeo
         layoutTrofeo = findViewById(R.id.layoutTrofeo);
         imgTrofeo = findViewById(R.id.imgTrofeo);
         tvTrofeoNombre = findViewById(R.id.tvTrofeoNombre);
         tvTrofeoPuntos = findViewById(R.id.tvTrofeoPuntos);
         imgTrofeo.setOnClickListener(v ->
-                drakoHelper.mostrarTextoEspecial("¡victoria ahora si lo capturamso; ya puedes verlo en tu seccion Premios!"));
+                drakoHelper.mostrarTextoEspecial("¡Victoria! ¡Ahora sí lo capturamos, ya puedes verlo en tu sección Premios!"));
 
         View drakoContainer = findViewById(R.id.layout_drako_container);
         ImageView imgDrako = drakoContainer.findViewById(R.id.imgDrako);
         TextView tvGlobo = drakoContainer.findViewById(R.id.tvGlobo);
         btnDrakoAccion = drakoContainer.findViewById(R.id.btnDrakoAccion);
 
-        // 2. Inicializar controladores y sensores (Parte A 3.2)
+        // 2. Inicializar controladores y sensores
         drakoHelper = new DrakoHelper(
                 this,
                 imgDrako,
@@ -117,15 +126,12 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
         colorHuntController = new ColorHuntController();
         anclajeSensor = new AnclajeSensor(this);
 
-        // Listener de toque para atrapar al Drako
+        // Listener de toque para atrapar al personaje
         imgMariposa.setOnClickListener(v -> alAtraparMariposa());
 
         // 3. Cargar acertijos e iniciar
         cargarAcertijos();
         verificarPermisoCamara();
-
-
-        progreso = new ProgresoManager(this);
     }
 
     private void verificarPermisoCamara() {
@@ -139,6 +145,38 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
                     new String[]{Manifest.permission.CAMERA},
                     CAMERA_PERMISSION_CODE
             );
+        }
+    }
+
+    private void evaluarAparicionMoneda() {
+        if (monedaDisponible) return;
+
+        if (random.nextInt(100) < 30) { // 30% de probabilidad
+            monedaDisponible = true;
+            if (imgMoneda != null) {
+                imgMoneda.setVisibility(View.VISIBLE);
+            }
+            MusicaManager.reproducirEfecto(R.raw.sfx_aparece);
+            if (tvEstadoEscaneo != null) {
+                tvEstadoEscaneo.append("\n¡Apareció una Moneda Sorpresa!");
+            }
+        }
+    }
+
+    public void recolectarMonedaSorpresa() {
+        if (!monedaDisponible) return;
+
+        monedaDisponible = false;
+
+        if (imgMoneda != null) {
+            imgMoneda.setVisibility(View.GONE);
+        }
+
+        MusicaManager.reproducirEfecto(R.raw.sfx_moneda);
+        progreso.sumarPuntos(10);
+
+        if (tvEstadoEscaneo != null) {
+            tvEstadoEscaneo.append("\n¡Moneda atrapada! +10 ParquePuntos (total: " + progreso.getPuntos() + ")");
         }
     }
 
@@ -320,7 +358,6 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
         handlerJuego.removeCallbacksAndMessages(null);
         ocultarTrofeo();
 
-        // Reiniciar estado de animacion y anclaje (Parte A 4.2)
         imgMariposa.setVisibility(View.GONE);
         imgMariposa.animate().cancel();
         enPersecucion = false;
@@ -335,6 +372,8 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
         }
 
         if (indiceActual < listaAcertijos.size()) {
+            evaluarAparicionMoneda();
+
             drakoHelper.mostrarTextoEspecial("¡Lee el acertijo de arriba, explorador!");
             acertijoActual = listaAcertijos.get(indiceActual);
             colorHuntController.setScanningActive(false);
@@ -359,10 +398,6 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
                                     @Override
                                     public void onProgressUpdate(int progress) {
                                         runOnUiThread(() -> {
-
-                                            //quitar al temrinar lo de Arcore y colores para que no ag aerrores
-                                            drakoHelper.mostrarTextoEspecial(NativeColorDetector.ultimoHsv);
-
                                             if (progressBarColor != null) {
                                                 progressBarColor.setProgress(progress);
                                             }
@@ -406,9 +441,9 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
         handlerJuego.postDelayed(this::iniciarJuegoPersecucion, 800 + random.nextInt(2200));
     }
 
-    // Parte B3: Iniciar persecución naciendo desde el centro del color detectado
     private void iniciarJuegoPersecucion() {
         enPersecucion = true;
+        MusicaManager.reproducirEfecto(R.raw.sfx_aparece);
 
         if (acertijoActual != null && acertijoActual.getImagenPersonajeResId() != 0) {
             imgMariposa.setImageResource(acertijoActual.getImagenPersonajeResId());
@@ -491,9 +526,8 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
                 .start();
     }
 
-    // Parte A 2.2: Métodos auxiliares de proyección
     private float mitadPersonaje() {
-        return 45f * getResources().getDisplayMetrics().density; // La mitad de 90dp
+        return 45f * getResources().getDisplayMetrics().density;
     }
 
     private float focalPx() {
@@ -504,7 +538,6 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
         return (alto / 2f) / (float) Math.tan(Math.toRadians(FOV_VERTICAL_GRADOS / 2f));
     }
 
-    // Parte A 2.3: Anclaje matemático de la pantalla al mundo
     private void anclarPersonaje() {
         if (!tieneOrientacion) return;
 
@@ -532,7 +565,6 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
         }
     }
 
-    // Parte A 3.1: Proyectar la posición 3D relativa a la orientación del celular
     private void proyectarPersonaje() {
         float[] r = rActual;
         float dx = r[0] * dirMundo[0] + r[3] * dirMundo[1] + r[6] * dirMundo[2];
@@ -559,7 +591,6 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
         imgMariposa.setY(y - mitadPersonaje());
     }
 
-    // Parte A 4.1: Atrapado con disparo de anclaje
     private void alAtraparMariposa() {
         if (!enPersecucion) return;
         enPersecucion = false;
@@ -569,7 +600,7 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
 
         imgMariposa.animate().scaleX(1.3f).scaleY(1.3f).setDuration(250)
                 .withEndAction(() -> {
-                    imgMariposa.setVisibility(View.GONE);   // el personaje se convierte en trofeo
+                    imgMariposa.setVisibility(View.GONE);
                     imgMariposa.setScaleX(1f);
                     imgMariposa.setScaleY(1f);
 
@@ -593,8 +624,8 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
         );
     }
 
-//inicialisacion de rotacion trancicion entre vueltas y manejo de estas
     private void mostrarTrofeo(boolean esNuevo) {
+        MusicaManager.reproducirEfecto(R.raw.sfx_victoria);
         String color = acertijoActual.getColorNombre();
         imgTrofeo.setImageResource(acertijoActual.getImagenPersonajeResId());
         Personaje p = Personaje.desdeColor(color);
@@ -640,7 +671,6 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
         imgTrofeo.setTranslationY(0f);
         layoutTrofeo.setVisibility(View.GONE);
     }
-
 
     private void actualizarInterfazDrako(String textoMensaje, String textoBoton, View.OnClickListener onClickListener) {
         if (tvAcertijo != null) {
@@ -702,11 +732,11 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        MusicaManager.cambiarPista(MusicaManager.Pista.ACERTIJO);
         if (drakoHelper != null) {
             drakoHelper.iniciarSinSaludo();
         }
 
-        // Parte A 3.2: Iniciar escucha de sensores
         if (anclajeSensor != null && anclajeSensor.disponible()) {
             anclajeSensor.iniciar(r -> {
                 System.arraycopy(r, 0, rActual, 0, 9);
@@ -716,6 +746,7 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
                 }
             });
         }
+
         if (layoutTrofeo != null && layoutTrofeo.getVisibility() == View.VISIBLE) {
             iniciarAnimacionesTrofeo();
         }
@@ -727,16 +758,8 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
         detenerAnimacionesTrofeo();
         handlerJuego.removeCallbacksAndMessages(null);
 
-        // Parte A 3.2: Detener sensores
         if (anclajeSensor != null) {
             anclajeSensor.detener();
-        }
-
-        if (drakoHelper != null) {
-            drakoHelper.detener();
-        }
-        if (imgMariposa != null) {
-            imgMariposa.animate().cancel();
         }
     }
 }

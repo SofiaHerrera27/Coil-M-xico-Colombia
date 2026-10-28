@@ -56,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        MusicaManager.cambiarPista(MusicaManager.Pista.AMBIENTE);
         drakoHelper.iniciar();   // muestra el mensaje y empieza a parpadear
         ProgresoManager progreso = new ProgresoManager(this);
         TextView tvPuntosMenu = findViewById(R.id.cardPuntos); // Reemplaza por tu ID real
