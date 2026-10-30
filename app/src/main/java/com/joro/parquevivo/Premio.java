@@ -19,24 +19,75 @@ public class Premio extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_premios);
 
+        // Conectar los elementos del XML.
         tvPuntosDisponibles = findViewById(R.id.tvPuntosDisponibles);
         tvResultadoCanje = findViewById(R.id.tvResultadoCanje);
 
-        Button btnSemilla = findViewById(R.id.btnCanjearSemilla);
-        Button btnInsignia = findViewById(R.id.btnCanjearInsignia);
-        Button btnGuardian = findViewById(R.id.btnCanjearGuardian);
+        // Botón para regresar.
         Button btnVolver = findViewById(R.id.btnVolverPremios);
 
-        btnSemilla.setOnClickListener(v ->
-                simularCanje("Semilla sorpresa", 50));
-
-        btnInsignia.setOnClickListener(v ->
-                simularCanje("Insignia de explorador", 100));
-
-        btnGuardian.setOnClickListener(v ->
-                simularCanje("Guardián de la naturaleza", 200));
-
         btnVolver.setOnClickListener(v -> finish());
+
+        // Conectar los 20 botones de premios.
+        configurarBoton(R.id.btnCanjearSombreroExplorador,
+                "Sombrero de explorador", 50);
+
+        configurarBoton(R.id.btnCanjearGorraGuardabosques,
+                "Gorra del guardabosques", 100);
+
+        configurarBoton(R.id.btnCanjearMochilaExploradora,
+                "Mochila exploradora", 100);
+
+        configurarBoton(R.id.btnCanjearBrujulaDorada,
+                "Brújula dorada", 150);
+
+        configurarBoton(R.id.btnCanjearMariposaMagica,
+                "Mariposa mágica", 150);
+
+        configurarBoton(R.id.btnCanjearSombreroMago,
+                "Sombrero de mago", 150);
+
+        configurarBoton(R.id.btnCanjearCristalEnergia,
+                "Cristal de energía", 200);
+
+        configurarBoton(R.id.btnCanjearZorritoBosque,
+                "Zorrito del bosque", 200);
+
+        configurarBoton(R.id.btnCanjearBuhoSabio,
+                "Búho sabio", 250);
+
+        configurarBoton(R.id.btnCanjearMedallaEcologica,
+                "Medalla ecológica", 250);
+
+        configurarBoton(R.id.btnCanjearCoronaDorada,
+                "Corona dorada", 300);
+
+        configurarBoton(R.id.btnCanjearAlasMagicas,
+                "Alas mágicas", 350);
+
+        configurarBoton(R.id.btnCanjearDragonBebe,
+                "Dragón bebé", 350);
+
+        configurarBoton(R.id.btnCanjearTunicaMagica,
+                "Túnica mágica", 350);
+
+        configurarBoton(R.id.btnCanjearGuardianBosque,
+                "Guardián del bosque", 400);
+
+        configurarBoton(R.id.btnCanjearTrajeAventurero,
+                "Traje de guardián del bosque", 400);
+
+        configurarBoton(R.id.btnCanjearVaritaNatural,
+                "Varita natural", 450);
+
+        configurarBoton(R.id.btnCanjearCofreMisterioso,
+                "Cofre misterioso", 500);
+
+        configurarBoton(R.id.btnCanjearArmaduraDorada,
+                "Armadura dorada", 600);
+
+        configurarBoton(R.id.btnCanjearAlasCelestiales,
+                "Alas celestiales", 700);
     }
 
     @Override
@@ -45,7 +96,9 @@ public class Premio extends AppCompatActivity {
         actualizarPuntos();
     }
 
+    // Consultar y mostrar los ParquePuntos disponibles.
     private void actualizarPuntos() {
+
         puntosDisponibles = ParquePuntos.obtenerPuntos(this);
 
         tvPuntosDisponibles.setText(
@@ -53,7 +106,20 @@ public class Premio extends AppCompatActivity {
         );
     }
 
+    // Configurar cada botón de canje.
+    private void configurarBoton(int idBoton, String nombrePremio, int costo) {
+
+        Button boton = findViewById(idBoton);
+
+        boton.setOnClickListener(v ->
+                simularCanje(nombrePremio, costo)
+        );
+    }
+
+    // Comprobar si el usuario tiene puntos suficientes.
     private void simularCanje(String nombrePremio, int costo) {
+
+        actualizarPuntos();
 
         if (puntosDisponibles >= costo) {
 
@@ -61,6 +127,8 @@ public class Premio extends AppCompatActivity {
                     "¡Canje simulado exitosamente!\n\n"
                             + "Premio: " + nombrePremio + "\n"
                             + "Costo: " + costo + " ParquePuntos.\n\n"
+                            + "¡Felicidades! Tienes suficientes puntos "
+                            + "para obtener esta recompensa.\n\n"
                             + "Esta es una demostración. "
                             + "Tus puntos no han sido descontados."
             );
@@ -73,11 +141,14 @@ public class Premio extends AppCompatActivity {
 
         } else {
 
+            int puntosFaltantes = costo - puntosDisponibles;
+
             tvResultadoCanje.setText(
                     "No tienes suficientes ParquePuntos.\n\n"
                             + "Premio: " + nombrePremio + "\n"
-                            + "Costo: " + costo + " puntos.\n"
-                            + "Disponibles: " + puntosDisponibles + " puntos."
+                            + "Costo: " + costo + " ParquePuntos.\n"
+                            + "Disponibles: " + puntosDisponibles + " puntos.\n"
+                            + "Te faltan: " + puntosFaltantes + " puntos."
             );
 
             Toast.makeText(

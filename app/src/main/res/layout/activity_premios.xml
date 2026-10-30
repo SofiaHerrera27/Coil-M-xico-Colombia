@@ -9,17 +9,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="20dp">
+        android:padding="20dp"
+        android:paddingBottom="40dp">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="PREMIOS PARQUEVIVO"
             android:textColor="#246B45"
-            android:textSize="25sp"
+            android:textSize="28sp"
             android:textStyle="bold"
             android:gravity="center"
-            android:padding="12dp" />
+            android:layout_marginBottom="12dp" />
 
         <TextView
             android:id="@+id/tvPuntosDisponibles"
@@ -30,127 +31,953 @@
             android:textSize="20sp"
             android:textStyle="bold"
             android:gravity="center"
-            android:padding="12dp" />
+            android:padding="12dp"
+            android:background="#DDEEDB"
+            android:layout_marginBottom="20dp" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Catálogo de recompensas"
-            android:textColor="#263D30"
-            android:textSize="19sp"
+            android:textColor="#333333"
+            android:textSize="22sp"
             android:textStyle="bold"
-            android:paddingTop="12dp"
-            android:paddingBottom="10dp" />
+            android:layout_marginBottom="16dp" />
+
+        <!-- CATEGORIA 1: PREMIOS INICIALES -->
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="1. PREMIOS INICIALES"
+            android:textColor="#246B45"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:padding="10dp"
+            android:background="#DDEEDB"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Premio: Sombrero de explorador -->
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            android:gravity="center"
             android:background="#FFFFFF"
             android:padding="16dp"
             android:layout_marginBottom="12dp">
 
+            <ImageView
+                android:layout_width="140dp"
+                android:layout_height="120dp"
+                android:src="@drawable/Sombrero_de_explorador"
+                android:scaleType="fitCenter"
+                android:contentDescription="Sombrero de explorador" />
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="🌱 Semilla sorpresa"
-                android:textColor="#263D30"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+                android:text="Sombrero de explorador"
+                android:textColor="#246B45"
+                android:textSize="19sp"
+                android:textStyle="bold"
+                android:gravity="center" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Costo: 50 ParquePuntos"
-                android:textColor="#555555"
-                android:paddingTop="6dp" />
+                android:textColor="#444444"
+                android:textSize="16sp"
+                android:gravity="center"
+                android:padding="8dp" />
 
             <Button
-                android:id="@+id/btnCanjearSemilla"
+                android:id="@+id/btnCanjearSombreroExplorador"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Simular canje"
-                android:layout_marginTop="8dp" />
+                android:text="Simular canje" />
         </LinearLayout>
+
+        <!-- Premio: Gorra del guardabosques -->
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            android:gravity="center"
             android:background="#FFFFFF"
             android:padding="16dp"
             android:layout_marginBottom="12dp">
 
+            <ImageView
+                android:layout_width="140dp"
+                android:layout_height="120dp"
+                android:src="@drawable/Gorra_guardabosques"
+                android:scaleType="fitCenter"
+                android:contentDescription="Gorra del guardabosques" />
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="🦋 Insignia de explorador"
-                android:textColor="#263D30"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+                android:text="Gorra del guardabosques"
+                android:textColor="#246B45"
+                android:textSize="19sp"
+                android:textStyle="bold"
+                android:gravity="center" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Costo: 100 ParquePuntos"
-                android:textColor="#555555"
-                android:paddingTop="6dp" />
+                android:textColor="#444444"
+                android:textSize="16sp"
+                android:gravity="center"
+                android:padding="8dp" />
 
             <Button
-                android:id="@+id/btnCanjearInsignia"
+                android:id="@+id/btnCanjearGorraGuardabosques"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Simular canje"
-                android:layout_marginTop="8dp" />
+                android:text="Simular canje" />
         </LinearLayout>
+
+        <!-- Premio: Mochila exploradora -->
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            android:gravity="center"
             android:background="#FFFFFF"
             android:padding="16dp"
             android:layout_marginBottom="12dp">
 
+            <ImageView
+                android:layout_width="140dp"
+                android:layout_height="120dp"
+                android:src="@drawable/Mochila"
+                android:scaleType="fitCenter"
+                android:contentDescription="Mochila exploradora" />
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="🌳 Guardián de la naturaleza"
-                android:textColor="#263D30"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+                android:text="Mochila exploradora"
+                android:textColor="#246B45"
+                android:textSize="19sp"
+                android:textStyle="bold"
+                android:gravity="center" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Costo: 100 ParquePuntos"
+                android:textColor="#444444"
+                android:textSize="16sp"
+                android:gravity="center"
+                android:padding="8dp" />
+
+            <Button
+                android:id="@+id/btnCanjearMochilaExploradora"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Simular canje" />
+        </LinearLayout>
+
+        <!-- CATEGORIA 2: PREMIOS DE EXPLORACION -->
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="2. PREMIOS DE EXPLORACIÓN"
+            android:textColor="#246B45"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:padding="10dp"
+            android:background="#DDEEDB"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Premio: Brújula dorada -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="#FFFFFF"
+            android:padding="16dp"
+            android:layout_marginBottom="12dp">
+
+            <ImageView
+                android:layout_width="140dp"
+                android:layout_height="120dp"
+                android:src="@drawable/brujula"
+                android:scaleType="fitCenter"
+                android:contentDescription="Brújula dorada" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Brújula dorada"
+                android:textColor="#246B45"
+                android:textSize="19sp"
+                android:textStyle="bold"
+                android:gravity="center" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Costo: 150 ParquePuntos"
+                android:textColor="#444444"
+                android:textSize="16sp"
+                android:gravity="center"
+                android:padding="8dp" />
+
+            <Button
+                android:id="@+id/btnCanjearBrujulaDorada"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Simular canje" />
+        </LinearLayout>
+
+        <!-- Premio: Mariposa mágica -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="#FFFFFF"
+            android:padding="16dp"
+            android:layout_marginBottom="12dp">
+
+            <ImageView
+                android:layout_width="140dp"
+                android:layout_height="120dp"
+                android:src="@drawable/Mariposa"
+                android:scaleType="fitCenter"
+                android:contentDescription="Mariposa mágica" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Mariposa mágica"
+                android:textColor="#246B45"
+                android:textSize="19sp"
+                android:textStyle="bold"
+                android:gravity="center" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Costo: 150 ParquePuntos"
+                android:textColor="#444444"
+                android:textSize="16sp"
+                android:gravity="center"
+                android:padding="8dp" />
+
+            <Button
+                android:id="@+id/btnCanjearMariposaMagica"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Simular canje" />
+        </LinearLayout>
+
+        <!-- Premio: Sombrero de mago -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="#FFFFFF"
+            android:padding="16dp"
+            android:layout_marginBottom="12dp">
+
+            <ImageView
+                android:layout_width="140dp"
+                android:layout_height="120dp"
+                android:src="@drawable/Sombrero_de_mago"
+                android:scaleType="fitCenter"
+                android:contentDescription="Sombrero de mago" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Sombrero de mago"
+                android:textColor="#246B45"
+                android:textSize="19sp"
+                android:textStyle="bold"
+                android:gravity="center" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Costo: 150 ParquePuntos"
+                android:textColor="#444444"
+                android:textSize="16sp"
+                android:gravity="center"
+                android:padding="8dp" />
+
+            <Button
+                android:id="@+id/btnCanjearSombreroMago"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Simular canje" />
+        </LinearLayout>
+
+        <!-- Premio: Cristal de energía -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="#FFFFFF"
+            android:padding="16dp"
+            android:layout_marginBottom="12dp">
+
+            <ImageView
+                android:layout_width="140dp"
+                android:layout_height="120dp"
+                android:src="@drawable/Cristal"
+                android:scaleType="fitCenter"
+                android:contentDescription="Cristal de energía" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Cristal de energía"
+                android:textColor="#246B45"
+                android:textSize="19sp"
+                android:textStyle="bold"
+                android:gravity="center" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Costo: 200 ParquePuntos"
-                android:textColor="#555555"
-                android:paddingTop="6dp" />
+                android:textColor="#444444"
+                android:textSize="16sp"
+                android:gravity="center"
+                android:padding="8dp" />
 
             <Button
-                android:id="@+id/btnCanjearGuardian"
+                android:id="@+id/btnCanjearCristalEnergia"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Simular canje"
-                android:layout_marginTop="8dp" />
+                android:text="Simular canje" />
         </LinearLayout>
+
+        <!-- Premio: Zorrito del bosque -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="#FFFFFF"
+            android:padding="16dp"
+            android:layout_marginBottom="12dp">
+
+            <ImageView
+                android:layout_width="140dp"
+                android:layout_height="120dp"
+                android:src="@drawable/Zorrito"
+                android:scaleType="fitCenter"
+                android:contentDescription="Zorrito del bosque" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Zorrito del bosque"
+                android:textColor="#246B45"
+                android:textSize="19sp"
+                android:textStyle="bold"
+                android:gravity="center" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Costo: 200 ParquePuntos"
+                android:textColor="#444444"
+                android:textSize="16sp"
+                android:gravity="center"
+                android:padding="8dp" />
+
+            <Button
+                android:id="@+id/btnCanjearZorritoBosque"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Simular canje" />
+        </LinearLayout>
+
+        <!-- CATEGORIA 3: PREMIOS ESPECIALES -->
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="3. PREMIOS ESPECIALES"
+            android:textColor="#246B45"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:padding="10dp"
+            android:background="#DDEEDB"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Premio: Búho sabio -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="#FFFFFF"
+            android:padding="16dp"
+            android:layout_marginBottom="12dp">
+
+            <ImageView
+                android:layout_width="140dp"
+                android:layout_height="120dp"
+                android:src="@drawable/Buho"
+                android:scaleType="fitCenter"
+                android:contentDescription="Búho sabio" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Búho sabio"
+                android:textColor="#246B45"
+                android:textSize="19sp"
+                android:textStyle="bold"
+                android:gravity="center" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Costo: 250 ParquePuntos"
+                android:textColor="#444444"
+                android:textSize="16sp"
+                android:gravity="center"
+                android:padding="8dp" />
+
+            <Button
+                android:id="@+id/btnCanjearBuhoSabio"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Simular canje" />
+        </LinearLayout>
+
+        <!-- Premio: Medalla ecológica -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="#FFFFFF"
+            android:padding="16dp"
+            android:layout_marginBottom="12dp">
+
+            <ImageView
+                android:layout_width="140dp"
+                android:layout_height="120dp"
+                android:src="@drawable/medalla"
+                android:scaleType="fitCenter"
+                android:contentDescription="Medalla ecológica" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Medalla ecológica"
+                android:textColor="#246B45"
+                android:textSize="19sp"
+                android:textStyle="bold"
+                android:gravity="center" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Costo: 250 ParquePuntos"
+                android:textColor="#444444"
+                android:textSize="16sp"
+                android:gravity="center"
+                android:padding="8dp" />
+
+            <Button
+                android:id="@+id/btnCanjearMedallaEcologica"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Simular canje" />
+        </LinearLayout>
+
+        <!-- Premio: Corona dorada -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="#FFFFFF"
+            android:padding="16dp"
+            android:layout_marginBottom="12dp">
+
+            <ImageView
+                android:layout_width="140dp"
+                android:layout_height="120dp"
+                android:src="@drawable/Corona_dorada"
+                android:scaleType="fitCenter"
+                android:contentDescription="Corona dorada" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Corona dorada"
+                android:textColor="#246B45"
+                android:textSize="19sp"
+                android:textStyle="bold"
+                android:gravity="center" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Costo: 300 ParquePuntos"
+                android:textColor="#444444"
+                android:textSize="16sp"
+                android:gravity="center"
+                android:padding="8dp" />
+
+            <Button
+                android:id="@+id/btnCanjearCoronaDorada"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Simular canje" />
+        </LinearLayout>
+
+        <!-- Premio: Alas mágicas -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="#FFFFFF"
+            android:padding="16dp"
+            android:layout_marginBottom="12dp">
+
+            <ImageView
+                android:layout_width="140dp"
+                android:layout_height="120dp"
+                android:src="@drawable/Alas_magicas"
+                android:scaleType="fitCenter"
+                android:contentDescription="Alas mágicas" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Alas mágicas"
+                android:textColor="#246B45"
+                android:textSize="19sp"
+                android:textStyle="bold"
+                android:gravity="center" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Costo: 350 ParquePuntos"
+                android:textColor="#444444"
+                android:textSize="16sp"
+                android:gravity="center"
+                android:padding="8dp" />
+
+            <Button
+                android:id="@+id/btnCanjearAlasMagicas"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Simular canje" />
+        </LinearLayout>
+
+        <!-- Premio: Dragón bebé -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="#FFFFFF"
+            android:padding="16dp"
+            android:layout_marginBottom="12dp">
+
+            <ImageView
+                android:layout_width="140dp"
+                android:layout_height="120dp"
+                android:src="@drawable/Dragón_bebé"
+                android:scaleType="fitCenter"
+                android:contentDescription="Dragón bebé" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Dragón bebé"
+                android:textColor="#246B45"
+                android:textSize="19sp"
+                android:textStyle="bold"
+                android:gravity="center" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Costo: 350 ParquePuntos"
+                android:textColor="#444444"
+                android:textSize="16sp"
+                android:gravity="center"
+                android:padding="8dp" />
+
+            <Button
+                android:id="@+id/btnCanjearDragonBebe"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Simular canje" />
+        </LinearLayout>
+
+        <!-- Premio: Túnica mágica -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="#FFFFFF"
+            android:padding="16dp"
+            android:layout_marginBottom="12dp">
+
+            <ImageView
+                android:layout_width="140dp"
+                android:layout_height="120dp"
+                android:src="@drawable/Tunica"
+                android:scaleType="fitCenter"
+                android:contentDescription="Túnica mágica" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Túnica mágica"
+                android:textColor="#246B45"
+                android:textSize="19sp"
+                android:textStyle="bold"
+                android:gravity="center" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Costo: 350 ParquePuntos"
+                android:textColor="#444444"
+                android:textSize="16sp"
+                android:gravity="center"
+                android:padding="8dp" />
+
+            <Button
+                android:id="@+id/btnCanjearTunicaMagica"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Simular canje" />
+        </LinearLayout>
+
+        <!-- CATEGORIA 4: PREMIOS EPICOS -->
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="4. PREMIOS ÉPICOS"
+            android:textColor="#246B45"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:padding="10dp"
+            android:background="#DDEEDB"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Premio: Guardián del bosque -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="#FFFFFF"
+            android:padding="16dp"
+            android:layout_marginBottom="12dp">
+
+            <ImageView
+                android:layout_width="140dp"
+                android:layout_height="120dp"
+                android:src="@drawable/Guardián"
+                android:scaleType="fitCenter"
+                android:contentDescription="Guardián del bosque" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Guardián del bosque"
+                android:textColor="#246B45"
+                android:textSize="19sp"
+                android:textStyle="bold"
+                android:gravity="center" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Costo: 400 ParquePuntos"
+                android:textColor="#444444"
+                android:textSize="16sp"
+                android:gravity="center"
+                android:padding="8dp" />
+
+            <Button
+                android:id="@+id/btnCanjearGuardianBosque"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Simular canje" />
+        </LinearLayout>
+
+        <!-- Premio: Traje de guardián del bosque -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="#FFFFFF"
+            android:padding="16dp"
+            android:layout_marginBottom="12dp">
+
+            <ImageView
+                android:layout_width="140dp"
+                android:layout_height="120dp"
+                android:src="@drawable/Guardián"
+                android:scaleType="fitCenter"
+                android:contentDescription="Traje de guardián del bosque" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Traje de guardián del bosque"
+                android:textColor="#246B45"
+                android:textSize="19sp"
+                android:textStyle="bold"
+                android:gravity="center" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Costo: 400 ParquePuntos"
+                android:textColor="#444444"
+                android:textSize="16sp"
+                android:gravity="center"
+                android:padding="8dp" />
+
+            <Button
+                android:id="@+id/btnCanjearTrajeAventurero"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Simular canje" />
+        </LinearLayout>
+
+        <!-- Premio: Varita natural -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="#FFFFFF"
+            android:padding="16dp"
+            android:layout_marginBottom="12dp">
+
+            <ImageView
+                android:layout_width="140dp"
+                android:layout_height="120dp"
+                android:src="@drawable/Varita"
+                android:scaleType="fitCenter"
+                android:contentDescription="Varita natural" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Varita natural"
+                android:textColor="#246B45"
+                android:textSize="19sp"
+                android:textStyle="bold"
+                android:gravity="center" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Costo: 450 ParquePuntos"
+                android:textColor="#444444"
+                android:textSize="16sp"
+                android:gravity="center"
+                android:padding="8dp" />
+
+            <Button
+                android:id="@+id/btnCanjearVaritaNatural"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Simular canje" />
+        </LinearLayout>
+
+        <!-- Premio: Cofre misterioso -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="#FFFFFF"
+            android:padding="16dp"
+            android:layout_marginBottom="12dp">
+
+            <ImageView
+                android:layout_width="140dp"
+                android:layout_height="120dp"
+                android:src="@drawable/cofre"
+                android:scaleType="fitCenter"
+                android:contentDescription="Cofre misterioso" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Cofre misterioso"
+                android:textColor="#246B45"
+                android:textSize="19sp"
+                android:textStyle="bold"
+                android:gravity="center" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Costo: 500 ParquePuntos"
+                android:textColor="#444444"
+                android:textSize="16sp"
+                android:gravity="center"
+                android:padding="8dp" />
+
+            <Button
+                android:id="@+id/btnCanjearCofreMisterioso"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Simular canje" />
+        </LinearLayout>
+
+        <!-- Premio: Armadura dorada -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="#FFFFFF"
+            android:padding="16dp"
+            android:layout_marginBottom="12dp">
+
+            <ImageView
+                android:layout_width="140dp"
+                android:layout_height="120dp"
+                android:src="@drawable/Armadura"
+                android:scaleType="fitCenter"
+                android:contentDescription="Armadura dorada" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Armadura dorada"
+                android:textColor="#246B45"
+                android:textSize="19sp"
+                android:textStyle="bold"
+                android:gravity="center" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Costo: 600 ParquePuntos"
+                android:textColor="#444444"
+                android:textSize="16sp"
+                android:gravity="center"
+                android:padding="8dp" />
+
+            <Button
+                android:id="@+id/btnCanjearArmaduraDorada"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Simular canje" />
+        </LinearLayout>
+
+        <!-- Premio: Alas celestiales -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="#FFFFFF"
+            android:padding="16dp"
+            android:layout_marginBottom="12dp">
+
+            <ImageView
+                android:layout_width="140dp"
+                android:layout_height="120dp"
+                android:src="@drawable/Alas_celestiales"
+                android:scaleType="fitCenter"
+                android:contentDescription="Alas celestiales" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Alas celestiales"
+                android:textColor="#246B45"
+                android:textSize="19sp"
+                android:textStyle="bold"
+                android:gravity="center" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Costo: 700 ParquePuntos"
+                android:textColor="#444444"
+                android:textSize="16sp"
+                android:gravity="center"
+                android:padding="8dp" />
+
+            <Button
+                android:id="@+id/btnCanjearAlasCelestiales"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Simular canje" />
+        </LinearLayout>
+
+        <!-- Resultado del canje -->
 
         <TextView
             android:id="@+id/tvResultadoCanje"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Aquí aparecerá el resultado de tu canje."
+            android:text=""
             android:textColor="#246B45"
             android:textSize="16sp"
-            android:padding="12dp"
-            android:gravity="center" />
+            android:padding="16dp"
+            android:background="#FFFFFF"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="16dp" />
 
         <Button
             android:id="@+id/btnVolverPremios"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Volver"
-            android:layout_marginTop="12dp" />
+            android:text="Volver" />
 
     </LinearLayout>
 </ScrollView>
