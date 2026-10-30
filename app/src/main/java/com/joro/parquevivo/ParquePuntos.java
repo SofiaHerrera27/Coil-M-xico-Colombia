@@ -109,7 +109,6 @@ public class ParquePuntos extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        // Actualiza los datos al volver a esta pantalla.
         actualizarInterfaz();
 
         if (drakoHelper != null) {
