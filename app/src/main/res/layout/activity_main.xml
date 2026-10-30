@@ -14,7 +14,7 @@
         android:src="@drawable/logomain2"
         android:contentDescription="Fondo Ilustrado ParqueVivo" />
 
-    <!-- Capa 2 (Contenido interactivo) -->
+    <!-- Capa 2 (Contenido interactivo navegable) -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -25,7 +25,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="24dp"
-            android:paddingBottom="140dp">
+            android:paddingBottom="100dp">
 
             <TextView
                 android:id="@+id/tvBienvenida"
@@ -51,18 +51,19 @@
                     android:clickable="true"
                     android:focusable="true"
                     app:cardCornerRadius="16dp"
-                    app:cardElevation="4dp">
+                    app:cardElevation="4dp"
+                    app:cardBackgroundColor="#CCFFFFFF">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:orientation="vertical"
-                        android:padding="16dp">
+                        android:padding="12dp">
 
                         <ImageView
-                            android:layout_width="56dp"
-                            android:layout_height="56dp"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
                             android:adjustViewBounds="true"
                             android:scaleType="fitCenter"
                             android:src="@drawable/ic_caza" />
@@ -76,6 +77,7 @@
                             android:textColor="@color/pv_verde_oscuro"
                             android:textStyle="bold" />
                     </LinearLayout>
+
                 </com.google.android.material.card.MaterialCardView>
 
                 <!-- Tarjeta 2: Álbum -->
@@ -88,18 +90,19 @@
                     android:clickable="true"
                     android:focusable="true"
                     app:cardCornerRadius="16dp"
-                    app:cardElevation="4dp">
+                    app:cardElevation="4dp"
+                    app:cardBackgroundColor="#CCFFFFFF">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:orientation="vertical"
-                        android:padding="16dp">
+                        android:padding="12dp">
 
                         <ImageView
-                            android:layout_width="56dp"
-                            android:layout_height="56dp"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
                             android:adjustViewBounds="true"
                             android:scaleType="fitCenter"
                             android:src="@drawable/ic_album" />
@@ -109,7 +112,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
                             android:gravity="center"
-                            android:text="Álbum"
+                            android:text="Álbum de Aventuras"
                             android:textColor="@color/pv_verde_oscuro"
                             android:textStyle="bold" />
                     </LinearLayout>
@@ -125,18 +128,19 @@
                     android:clickable="true"
                     android:focusable="true"
                     app:cardCornerRadius="16dp"
-                    app:cardElevation="4dp">
+                    app:cardElevation="4dp"
+                    app:cardBackgroundColor="#CCFFFFFF">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:orientation="vertical"
-                        android:padding="16dp">
+                        android:padding="12dp">
 
                         <ImageView
-                            android:layout_width="56dp"
-                            android:layout_height="56dp"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
                             android:adjustViewBounds="true"
                             android:scaleType="fitCenter"
                             android:src="@drawable/ic_puntos" />
@@ -163,18 +167,19 @@
                     android:clickable="true"
                     android:focusable="true"
                     app:cardCornerRadius="16dp"
-                    app:cardElevation="4dp">
+                    app:cardElevation="4dp"
+                    app:cardBackgroundColor="#CCFFFFFF">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:orientation="vertical"
-                        android:padding="16dp">
+                        android:padding="12dp">
 
                         <ImageView
-                            android:layout_width="56dp"
-                            android:layout_height="56dp"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
                             android:adjustViewBounds="true"
                             android:scaleType="fitCenter"
                             android:src="@drawable/ic_trivia" />
@@ -200,18 +205,19 @@
                     android:clickable="true"
                     android:focusable="true"
                     app:cardCornerRadius="16dp"
-                    app:cardElevation="4dp">
+                    app:cardElevation="4dp"
+                    app:cardBackgroundColor="#CCFFFFFF">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:orientation="vertical"
-                        android:padding="16dp">
+                        android:padding="12dp">
 
                         <ImageView
-                            android:layout_width="56dp"
-                            android:layout_height="56dp"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
                             android:adjustViewBounds="true"
                             android:scaleType="fitCenter"
                             android:src="@drawable/ic_premios" />
@@ -229,22 +235,40 @@
 
             </GridLayout>
 
-            <Button
-                android:id="@+id/btnSalir"
-                android:layout_width="wrap_content"
-                android:layout_height="56dp"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="24dp"
-                android:paddingStart="32dp"
-                android:paddingEnd="32dp"
-                android:text="Cerrar sesión"
-                android:textAllCaps="false"
-                android:textColor="@color/pv_blanco"
-                android:textStyle="bold" />
         </LinearLayout>
+
     </ScrollView>
 
-    <!-- Capa 3 (Drako Flotante) -->
+    <!-- Capa 3 (Botón Cerrar Sesión fijo abajo a la izquierda) -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnSalir"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|start"
+        android:layout_marginStart="24dp"
+        android:layout_marginBottom="24dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:text="Cerrar sesión"
+        android:textAllCaps="false"
+        android:textSize="13sp"
+        app:backgroundTint="#CC1B5E20"
+        app:cornerRadius="12dp" />
+
+    <!-- Capa 4 (Botón Música arriba a la derecha, listo para imágenes de césped) -->
+    <ImageButton
+        android:id="@+id/btnMusicaToggle"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_gravity="top|end"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="20dp"
+        android:background="@android:color/transparent"
+        android:contentDescription="Alternar música de fondo"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_music_on" />
+
+    <!-- Capa 5 (Drako Flotante) -->
     <include layout="@layout/layout_drako_flotante" />
 
 </FrameLayout>

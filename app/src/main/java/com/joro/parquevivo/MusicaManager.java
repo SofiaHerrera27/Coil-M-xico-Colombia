@@ -21,19 +21,38 @@ public class MusicaManager {
     private static Context appContext;
     private static MediaPlayer player;
     private static boolean debeSonar = false;
+    private static boolean musicaHabilitada = true; // Control global del usuario
     private static Pista pistaActual = Pista.AMBIENTE;
     private static int bajadas = 0;
 
-    // Inicializa el contexto global de la aplicación
     public static void init(Context context) {
         if (context != null) {
             appContext = context.getApplicationContext();
         }
     }
 
-    // Arranca o reanuda la música de esa pista. Se llama desde onResume.
+    // --- NUEVO: Control de interruptor de música ---
+    public static boolean isMusicaHabilitada() {
+        return musicaHabilitada;
+    }
+
+    public static boolean toggleMusica(Context context) {
+        init(context);
+        musicaHabilitada = !musicaHabilitada;
+
+        if (musicaHabilitada) {
+            debeSonar = true;
+            actualizar();
+        } else {
+            pausar();
+        }
+        return musicaHabilitada;
+    }
+
     public static void reanudar(Context context, Pista pista) {
         init(context);
+        if (!musicaHabilitada) return; // Si el usuario la apagó, se respeta la decisión
+
         if (pista != pistaActual || player == null) {
             pistaActual = pista;
             liberar();
@@ -42,7 +61,6 @@ public class MusicaManager {
         actualizar();
     }
 
-    // Métodos de conveniencia para cambiar pista
     public static void cambiarPista(Context context, Pista pista) {
         reanudar(context, pista);
     }
@@ -53,7 +71,6 @@ public class MusicaManager {
         }
     }
 
-    // Pausa sin soltar la canción. Se llama desde onPause.
     public static void pausar() {
         debeSonar = false;
         try {
@@ -61,16 +78,14 @@ public class MusicaManager {
         } catch (Exception ignored) { }
     }
 
-    // Apaga todo. Se llama al cerrar sesión.
     public static void detener() {
         debeSonar = false;
         bajadas = 0;
         liberar();
     }
 
-    public static boolean musicaActiva() { return debeSonar; }
+    public static boolean musicaActiva() { return debeSonar && musicaHabilitada; }
 
-    // Reproduce efectos de sonido independientes de la música de fondo
     public static void reproducirEfecto(Context context, int rawId) {
         init(context);
         reproducirEfecto(rawId);
@@ -113,7 +128,7 @@ public class MusicaManager {
     }
 
     private static void actualizar() {
-        if (appContext == null || !debeSonar) return;
+        if (appContext == null || !debeSonar || !musicaHabilitada) return;
         try {
             if (player == null) {
                 player = MediaPlayer.create(appContext, pistaActual.rawId);

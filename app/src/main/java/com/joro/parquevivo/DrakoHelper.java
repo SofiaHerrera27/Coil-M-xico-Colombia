@@ -5,6 +5,7 @@ import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.SystemClock;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 import android.view.View;
@@ -22,6 +23,11 @@ public class DrakoHelper implements TextToSpeech.OnInitListener {
     private MediaPlayer vozLocal;
     private TextToSpeech tts;
     private boolean ttsListo = false;
+
+    // --- Control de Anti-Spam y Tiempos ---
+    private long ultimoClickTime = 0;
+    private int contadorClicksRapidos = 0;
+    private static final long TIEMPO_ENTRE_HABLA_MS = 2500; // Cooldown de 2.5s
 
     public enum TipoPantalla {
         LOGIN,
@@ -65,7 +71,8 @@ public class DrakoHelper implements TextToSpeech.OnInitListener {
         }
 
         if (this.imgDrako != null) {
-            this.imgDrako.setOnClickListener(v -> darConsejoOSaludo());
+            // Asigna el nuevo método de control con anti-spam
+            this.imgDrako.setOnClickListener(v -> alHacerClickEnDrako());
         }
 
         // Inicializar motor de voz TTS
@@ -113,6 +120,50 @@ public class DrakoHelper implements TextToSpeech.OnInitListener {
         }
     }
 
+    // LÓGICA ANTI-SATURACIÓN DE CLICS
+    private void alHacerClickEnDrako() {
+        long tiempoActual = SystemClock.elapsedRealtime();
+        long tiempoTranscurrido = tiempoActual - ultimoClickTime;
+
+        // Detectar si están presionando muy rápido (menos de 1.2 segundos entre toques)
+        if (tiempoTranscurrido < 1200) {
+            contadorClicksRapidos++;
+        } else if (tiempoTranscurrido > 3000) {
+            // Si pasan más de 3 segundos se reinicia el conteo
+            contadorClicksRapidos = 0;
+        }
+
+        // Si lo presionan 3 o más veces seguidas muy rápido
+        if (contadorClicksRapidos >= 3) {
+            ultimoClickTime = tiempoActual;
+            contadorClicksRapidos = 0;
+            decirMensajeGracioso();
+            return;
+        }
+
+        // Bloquear toques normales durante el tiempo de espera (cooldown)
+        if (tiempoTranscurrido < TIEMPO_ENTRE_HABLA_MS) {
+            return; // Ignora el clic silenciosamente para no congelar ni saturar la voz
+        }
+
+        ultimoClickTime = tiempoActual;
+        contadorClicksRapidos = 0;
+        darConsejoOSaludo();
+    }
+
+    private void decirMensajeGracioso() {
+        String[] frasesSpam = {
+                "¡Oye, me das cosquillas! Ve más despacio.",
+                "¡Ey! Dame un segundito para tomar aire.",
+                "¡Jajaja, alto ahí! No me presiones tan rápido.",
+                "¡Despacio, aventurero! Me vas a marear.",
+                "¡Uf! Espera a que termine de hablar."
+        };
+
+        String frase = frasesSpam[random.nextInt(frasesSpam.length)];
+        mostrarTextoEspecial(frase);
+    }
+
     // PARPADEO
     private void parpadear(int paso) {
         Drawable[] frames = {medio, cerrado, medio, abierto};
@@ -122,7 +173,7 @@ public class DrakoHelper implements TextToSpeech.OnInitListener {
 
         imgDrako.setImageDrawable(frames[paso]);
 
-        if (paso < frames.length - 1) { // CORREGIDO: Se agregó el operador '- 1'
+        if (paso < frames.length - 1) {
             handler.postDelayed(() -> parpadear(paso + 1), pausas[paso]);
         } else {
             programarSiguiente();
@@ -265,6 +316,7 @@ public class DrakoHelper implements TextToSpeech.OnInitListener {
         String textoAMostrar = mensajes[indexActual];
 
         tvGlobo.setText(textoAMostrar);
+        tvGlobo.setAlpha(0.85f); // Transparencia
         tvGlobo.setVisibility(View.VISIBLE);
 
         hablar(textoAMostrar);
@@ -276,6 +328,7 @@ public class DrakoHelper implements TextToSpeech.OnInitListener {
     public void mostrarTextoEspecial(String texto) {
         if (tvGlobo != null) {
             tvGlobo.setText(texto);
+            tvGlobo.setAlpha(0.85f); // Transparencia
             tvGlobo.setVisibility(View.VISIBLE);
             hablar(texto);
         }

@@ -3,6 +3,7 @@ package com.joro.parquevivo;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -33,6 +34,25 @@ public class MainActivity extends AppCompatActivity {
                 tvGlobo,
                 DrakoHelper.TipoPantalla.INICIO
         );
+        ImageButton btnMusicaToggle = findViewById(R.id.btnMusicaToggle);
+
+// 1. Asignar imagen inicial según el estado actual
+        if (MusicaManager.isMusicaHabilitada()) {
+            btnMusicaToggle.setImageResource(R.drawable.ic_music_on);
+        } else {
+            btnMusicaToggle.setImageResource(R.drawable.ic_music_off);
+        }
+
+// 2. Escuchar el clic para pausar o encender
+        btnMusicaToggle.setOnClickListener(v -> {
+            boolean estaActiva = MusicaManager.toggleMusica(this);
+
+            if (estaActiva) {
+                btnMusicaToggle.setImageResource(R.drawable.ic_music_on);
+            } else {
+                btnMusicaToggle.setImageResource(R.drawable.ic_music_off);
+            }
+        });
 
         // 1. Navegación a las actividades activas
         findViewById(R.id.cardCaza).setOnClickListener(v ->
