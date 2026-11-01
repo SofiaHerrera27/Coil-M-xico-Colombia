@@ -4,6 +4,7 @@
     android:layout_height="wrap_content"
     android:layout_gravity="bottom|end"
     android:layout_margin="16dp"
+    android:background="@android:color/transparent"
     android:gravity="end"
     android:orientation="vertical">
 
@@ -28,13 +29,17 @@
         android:textSize="12sp"
         android:visibility="gone" />
 
+    <!-- Imagen de Drako con fondo transparente forzado -->
     <ImageView
         android:id="@+id/imgDrako"
         android:layout_width="80dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="6dp"
         android:adjustViewBounds="true"
+        android:background="@android:color/transparent"
         android:contentDescription="Drako, toca para escuchar un consejo"
+        android:elevation="0dp"
         android:scaleType="fitCenter"
         android:src="@drawable/drako" />
+
 </LinearLayout>

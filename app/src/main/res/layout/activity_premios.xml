@@ -44,7 +44,7 @@
             android:textStyle="bold"
             android:layout_marginBottom="16dp" />
 
-        <!-- CATEGORIA 1: PREMIOS INICIALES -->
+        <!-- ================= CATEGORIA 1: PREMIOS INICIALES ================= -->
 
         <TextView
             android:layout_width="match_parent"
@@ -58,7 +58,6 @@
             android:layout_marginBottom="12dp" />
 
         <!-- Premio: Sombrero de explorador -->
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -67,14 +66,13 @@
             android:background="#FFFFFF"
             android:padding="16dp"
             android:layout_marginBottom="12dp">
-
             <ImageView
+                android:id="@+id/imgSombreroExplorador"
                 android:layout_width="140dp"
                 android:layout_height="120dp"
-                android:src="@drawable/Sombrero_de_explorador"
+                android:src="@drawable/sombrero_de_explorador"
                 android:scaleType="fitCenter"
                 android:contentDescription="Sombrero de explorador" />
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -83,7 +81,6 @@
                 android:textSize="19sp"
                 android:textStyle="bold"
                 android:gravity="center" />
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -92,7 +89,6 @@
                 android:textSize="16sp"
                 android:gravity="center"
                 android:padding="8dp" />
-
             <Button
                 android:id="@+id/btnCanjearSombreroExplorador"
                 android:layout_width="match_parent"
@@ -101,7 +97,6 @@
         </LinearLayout>
 
         <!-- Premio: Gorra del guardabosques -->
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -110,14 +105,13 @@
             android:background="#FFFFFF"
             android:padding="16dp"
             android:layout_marginBottom="12dp">
-
             <ImageView
+                android:id="@+id/imgGorraGuardabosques"
                 android:layout_width="140dp"
                 android:layout_height="120dp"
-                android:src="@drawable/Gorra_guardabosques"
+                android:src="@drawable/gorra_guardabosques"
                 android:scaleType="fitCenter"
                 android:contentDescription="Gorra del guardabosques" />
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -126,7 +120,6 @@
                 android:textSize="19sp"
                 android:textStyle="bold"
                 android:gravity="center" />
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -135,7 +128,6 @@
                 android:textSize="16sp"
                 android:gravity="center"
                 android:padding="8dp" />
-
             <Button
                 android:id="@+id/btnCanjearGorraGuardabosques"
                 android:layout_width="match_parent"
@@ -144,7 +136,6 @@
         </LinearLayout>
 
         <!-- Premio: Mochila exploradora -->
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -153,14 +144,13 @@
             android:background="#FFFFFF"
             android:padding="16dp"
             android:layout_marginBottom="12dp">
-
             <ImageView
+                android:id="@+id/imgMochilaExploradora"
                 android:layout_width="140dp"
                 android:layout_height="120dp"
-                android:src="@drawable/Mochila"
+                android:src="@drawable/mochila"
                 android:scaleType="fitCenter"
                 android:contentDescription="Mochila exploradora" />
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -169,7 +159,6 @@
                 android:textSize="19sp"
                 android:textStyle="bold"
                 android:gravity="center" />
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -178,7 +167,6 @@
                 android:textSize="16sp"
                 android:gravity="center"
                 android:padding="8dp" />
-
             <Button
                 android:id="@+id/btnCanjearMochilaExploradora"
                 android:layout_width="match_parent"
@@ -186,7 +174,7 @@
                 android:text="Simular canje" />
         </LinearLayout>
 
-        <!-- CATEGORIA 2: PREMIOS DE EXPLORACION -->
+        <!-- ================= CATEGORIA 2: PREMIOS DE EXPLORACION ================= -->
 
         <TextView
             android:layout_width="match_parent"
@@ -201,7 +189,6 @@
             android:layout_marginBottom="12dp" />
 
         <!-- Premio: Brújula dorada -->
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -210,14 +197,13 @@
             android:background="#FFFFFF"
             android:padding="16dp"
             android:layout_marginBottom="12dp">
-
             <ImageView
+                android:id="@+id/imgBrujulaDorada"
                 android:layout_width="140dp"
                 android:layout_height="120dp"
                 android:src="@drawable/brujula"
                 android:scaleType="fitCenter"
                 android:contentDescription="Brújula dorada" />
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -226,7 +212,6 @@
                 android:textSize="19sp"
                 android:textStyle="bold"
                 android:gravity="center" />
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -235,7 +220,6 @@
                 android:textSize="16sp"
                 android:gravity="center"
                 android:padding="8dp" />
-
             <Button
                 android:id="@+id/btnCanjearBrujulaDorada"
                 android:layout_width="match_parent"
@@ -244,7 +228,6 @@
         </LinearLayout>
 
         <!-- Premio: Mariposa mágica -->
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -253,14 +236,13 @@
             android:background="#FFFFFF"
             android:padding="16dp"
             android:layout_marginBottom="12dp">
-
             <ImageView
+                android:id="@+id/imgMariposaMagica"
                 android:layout_width="140dp"
                 android:layout_height="120dp"
-                android:src="@drawable/Mariposa"
+                android:src="@drawable/mariposa"
                 android:scaleType="fitCenter"
                 android:contentDescription="Mariposa mágica" />
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -269,7 +251,6 @@
                 android:textSize="19sp"
                 android:textStyle="bold"
                 android:gravity="center" />
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -278,7 +259,6 @@
                 android:textSize="16sp"
                 android:gravity="center"
                 android:padding="8dp" />
-
             <Button
                 android:id="@+id/btnCanjearMariposaMagica"
                 android:layout_width="match_parent"
@@ -287,7 +267,6 @@
         </LinearLayout>
 
         <!-- Premio: Sombrero de mago -->
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -296,14 +275,13 @@
             android:background="#FFFFFF"
             android:padding="16dp"
             android:layout_marginBottom="12dp">
-
             <ImageView
+                android:id="@+id/imgSombreroMago"
                 android:layout_width="140dp"
                 android:layout_height="120dp"
-                android:src="@drawable/Sombrero_de_mago"
+                android:src="@drawable/sombrero_de_mago"
                 android:scaleType="fitCenter"
                 android:contentDescription="Sombrero de mago" />
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -312,7 +290,6 @@
                 android:textSize="19sp"
                 android:textStyle="bold"
                 android:gravity="center" />
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -321,7 +298,6 @@
                 android:textSize="16sp"
                 android:gravity="center"
                 android:padding="8dp" />
-
             <Button
                 android:id="@+id/btnCanjearSombreroMago"
                 android:layout_width="match_parent"
@@ -330,7 +306,6 @@
         </LinearLayout>
 
         <!-- Premio: Cristal de energía -->
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -339,14 +314,13 @@
             android:background="#FFFFFF"
             android:padding="16dp"
             android:layout_marginBottom="12dp">
-
             <ImageView
+                android:id="@+id/imgCristalEnergia"
                 android:layout_width="140dp"
                 android:layout_height="120dp"
-                android:src="@drawable/Cristal"
+                android:src="@drawable/cristal"
                 android:scaleType="fitCenter"
                 android:contentDescription="Cristal de energía" />
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -355,7 +329,6 @@
                 android:textSize="19sp"
                 android:textStyle="bold"
                 android:gravity="center" />
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -364,7 +337,6 @@
                 android:textSize="16sp"
                 android:gravity="center"
                 android:padding="8dp" />
-
             <Button
                 android:id="@+id/btnCanjearCristalEnergia"
                 android:layout_width="match_parent"
@@ -373,7 +345,6 @@
         </LinearLayout>
 
         <!-- Premio: Zorrito del bosque -->
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -382,14 +353,13 @@
             android:background="#FFFFFF"
             android:padding="16dp"
             android:layout_marginBottom="12dp">
-
             <ImageView
+                android:id="@+id/imgZorritoBosque"
                 android:layout_width="140dp"
                 android:layout_height="120dp"
-                android:src="@drawable/Zorrito"
+                android:src="@drawable/zorrito"
                 android:scaleType="fitCenter"
                 android:contentDescription="Zorrito del bosque" />
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -398,7 +368,6 @@
                 android:textSize="19sp"
                 android:textStyle="bold"
                 android:gravity="center" />
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -407,7 +376,6 @@
                 android:textSize="16sp"
                 android:gravity="center"
                 android:padding="8dp" />
-
             <Button
                 android:id="@+id/btnCanjearZorritoBosque"
                 android:layout_width="match_parent"
@@ -415,7 +383,7 @@
                 android:text="Simular canje" />
         </LinearLayout>
 
-        <!-- CATEGORIA 3: PREMIOS ESPECIALES -->
+        <!-- ================= CATEGORIA 3: PREMIOS ESPECIALES ================= -->
 
         <TextView
             android:layout_width="match_parent"
@@ -430,7 +398,6 @@
             android:layout_marginBottom="12dp" />
 
         <!-- Premio: Búho sabio -->
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -439,14 +406,13 @@
             android:background="#FFFFFF"
             android:padding="16dp"
             android:layout_marginBottom="12dp">
-
             <ImageView
+                android:id="@+id/imgBuhoSabio"
                 android:layout_width="140dp"
                 android:layout_height="120dp"
-                android:src="@drawable/Buho"
+                android:src="@drawable/buho"
                 android:scaleType="fitCenter"
                 android:contentDescription="Búho sabio" />
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -455,7 +421,6 @@
                 android:textSize="19sp"
                 android:textStyle="bold"
                 android:gravity="center" />
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -464,7 +429,6 @@
                 android:textSize="16sp"
                 android:gravity="center"
                 android:padding="8dp" />
-
             <Button
                 android:id="@+id/btnCanjearBuhoSabio"
                 android:layout_width="match_parent"
@@ -473,7 +437,6 @@
         </LinearLayout>
 
         <!-- Premio: Medalla ecológica -->
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -482,14 +445,13 @@
             android:background="#FFFFFF"
             android:padding="16dp"
             android:layout_marginBottom="12dp">
-
             <ImageView
+                android:id="@+id/imgMedallaEcologica"
                 android:layout_width="140dp"
                 android:layout_height="120dp"
                 android:src="@drawable/medalla"
                 android:scaleType="fitCenter"
                 android:contentDescription="Medalla ecológica" />
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -498,7 +460,6 @@
                 android:textSize="19sp"
                 android:textStyle="bold"
                 android:gravity="center" />
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -507,7 +468,6 @@
                 android:textSize="16sp"
                 android:gravity="center"
                 android:padding="8dp" />
-
             <Button
                 android:id="@+id/btnCanjearMedallaEcologica"
                 android:layout_width="match_parent"
@@ -516,7 +476,6 @@
         </LinearLayout>
 
         <!-- Premio: Corona dorada -->
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -525,14 +484,13 @@
             android:background="#FFFFFF"
             android:padding="16dp"
             android:layout_marginBottom="12dp">
-
             <ImageView
+                android:id="@+id/imgCoronaDorada"
                 android:layout_width="140dp"
                 android:layout_height="120dp"
-                android:src="@drawable/Corona_dorada"
+                android:src="@drawable/corona_dorada"
                 android:scaleType="fitCenter"
                 android:contentDescription="Corona dorada" />
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -541,7 +499,6 @@
                 android:textSize="19sp"
                 android:textStyle="bold"
                 android:gravity="center" />
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -550,7 +507,6 @@
                 android:textSize="16sp"
                 android:gravity="center"
                 android:padding="8dp" />
-
             <Button
                 android:id="@+id/btnCanjearCoronaDorada"
                 android:layout_width="match_parent"
@@ -559,7 +515,6 @@
         </LinearLayout>
 
         <!-- Premio: Alas mágicas -->
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -568,14 +523,13 @@
             android:background="#FFFFFF"
             android:padding="16dp"
             android:layout_marginBottom="12dp">
-
             <ImageView
+                android:id="@+id/imgAlasMagicas"
                 android:layout_width="140dp"
                 android:layout_height="120dp"
-                android:src="@drawable/Alas_magicas"
+                android:src="@drawable/alas_magicas"
                 android:scaleType="fitCenter"
                 android:contentDescription="Alas mágicas" />
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -584,7 +538,6 @@
                 android:textSize="19sp"
                 android:textStyle="bold"
                 android:gravity="center" />
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -593,7 +546,6 @@
                 android:textSize="16sp"
                 android:gravity="center"
                 android:padding="8dp" />
-
             <Button
                 android:id="@+id/btnCanjearAlasMagicas"
                 android:layout_width="match_parent"
@@ -602,7 +554,6 @@
         </LinearLayout>
 
         <!-- Premio: Dragón bebé -->
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -611,14 +562,13 @@
             android:background="#FFFFFF"
             android:padding="16dp"
             android:layout_marginBottom="12dp">
-
             <ImageView
+                android:id="@+id/imgDragonBebe"
                 android:layout_width="140dp"
                 android:layout_height="120dp"
-                android:src="@drawable/Dragón_bebé"
+                android:src="@drawable/dragon_bebe"
                 android:scaleType="fitCenter"
                 android:contentDescription="Dragón bebé" />
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -627,7 +577,6 @@
                 android:textSize="19sp"
                 android:textStyle="bold"
                 android:gravity="center" />
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -636,7 +585,6 @@
                 android:textSize="16sp"
                 android:gravity="center"
                 android:padding="8dp" />
-
             <Button
                 android:id="@+id/btnCanjearDragonBebe"
                 android:layout_width="match_parent"
@@ -645,7 +593,6 @@
         </LinearLayout>
 
         <!-- Premio: Túnica mágica -->
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -654,14 +601,13 @@
             android:background="#FFFFFF"
             android:padding="16dp"
             android:layout_marginBottom="12dp">
-
             <ImageView
+                android:id="@+id/imgTunicaMagica"
                 android:layout_width="140dp"
                 android:layout_height="120dp"
-                android:src="@drawable/Tunica"
+                android:src="@drawable/tunica"
                 android:scaleType="fitCenter"
                 android:contentDescription="Túnica mágica" />
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -670,7 +616,6 @@
                 android:textSize="19sp"
                 android:textStyle="bold"
                 android:gravity="center" />
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -679,7 +624,6 @@
                 android:textSize="16sp"
                 android:gravity="center"
                 android:padding="8dp" />
-
             <Button
                 android:id="@+id/btnCanjearTunicaMagica"
                 android:layout_width="match_parent"
@@ -687,7 +631,7 @@
                 android:text="Simular canje" />
         </LinearLayout>
 
-        <!-- CATEGORIA 4: PREMIOS EPICOS -->
+        <!-- ================= CATEGORIA 4: PREMIOS EPICOS ================= -->
 
         <TextView
             android:layout_width="match_parent"
@@ -702,7 +646,6 @@
             android:layout_marginBottom="12dp" />
 
         <!-- Premio: Guardián del bosque -->
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -711,14 +654,13 @@
             android:background="#FFFFFF"
             android:padding="16dp"
             android:layout_marginBottom="12dp">
-
             <ImageView
+                android:id="@+id/imgGuardianBosque"
                 android:layout_width="140dp"
                 android:layout_height="120dp"
-                android:src="@drawable/Guardián"
+                android:src="@drawable/guardian"
                 android:scaleType="fitCenter"
                 android:contentDescription="Guardián del bosque" />
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -727,7 +669,6 @@
                 android:textSize="19sp"
                 android:textStyle="bold"
                 android:gravity="center" />
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -736,7 +677,6 @@
                 android:textSize="16sp"
                 android:gravity="center"
                 android:padding="8dp" />
-
             <Button
                 android:id="@+id/btnCanjearGuardianBosque"
                 android:layout_width="match_parent"
@@ -745,7 +685,6 @@
         </LinearLayout>
 
         <!-- Premio: Traje de guardián del bosque -->
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -754,23 +693,21 @@
             android:background="#FFFFFF"
             android:padding="16dp"
             android:layout_marginBottom="12dp">
-
             <ImageView
+                android:id="@+id/imgTrajeAventurero"
                 android:layout_width="140dp"
                 android:layout_height="120dp"
-                android:src="@drawable/Guardián"
+                android:src="@drawable/aventurero"
                 android:scaleType="fitCenter"
-                android:contentDescription="Traje de guardián del bosque" />
-
+                android:contentDescription="Traje de aventurero" />
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Traje de guardián del bosque"
+                android:text="Traje de aventurero"
                 android:textColor="#246B45"
                 android:textSize="19sp"
                 android:textStyle="bold"
                 android:gravity="center" />
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -779,7 +716,6 @@
                 android:textSize="16sp"
                 android:gravity="center"
                 android:padding="8dp" />
-
             <Button
                 android:id="@+id/btnCanjearTrajeAventurero"
                 android:layout_width="match_parent"
@@ -788,7 +724,6 @@
         </LinearLayout>
 
         <!-- Premio: Varita natural -->
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -797,14 +732,13 @@
             android:background="#FFFFFF"
             android:padding="16dp"
             android:layout_marginBottom="12dp">
-
             <ImageView
+                android:id="@+id/imgVaritaNatural"
                 android:layout_width="140dp"
                 android:layout_height="120dp"
-                android:src="@drawable/Varita"
+                android:src="@drawable/varita"
                 android:scaleType="fitCenter"
                 android:contentDescription="Varita natural" />
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -813,7 +747,6 @@
                 android:textSize="19sp"
                 android:textStyle="bold"
                 android:gravity="center" />
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -822,7 +755,6 @@
                 android:textSize="16sp"
                 android:gravity="center"
                 android:padding="8dp" />
-
             <Button
                 android:id="@+id/btnCanjearVaritaNatural"
                 android:layout_width="match_parent"
@@ -831,7 +763,6 @@
         </LinearLayout>
 
         <!-- Premio: Cofre misterioso -->
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -840,14 +771,13 @@
             android:background="#FFFFFF"
             android:padding="16dp"
             android:layout_marginBottom="12dp">
-
             <ImageView
+                android:id="@+id/imgCofreMisterioso"
                 android:layout_width="140dp"
                 android:layout_height="120dp"
                 android:src="@drawable/cofre"
                 android:scaleType="fitCenter"
                 android:contentDescription="Cofre misterioso" />
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -856,7 +786,6 @@
                 android:textSize="19sp"
                 android:textStyle="bold"
                 android:gravity="center" />
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -865,7 +794,6 @@
                 android:textSize="16sp"
                 android:gravity="center"
                 android:padding="8dp" />
-
             <Button
                 android:id="@+id/btnCanjearCofreMisterioso"
                 android:layout_width="match_parent"
@@ -874,7 +802,6 @@
         </LinearLayout>
 
         <!-- Premio: Armadura dorada -->
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -883,14 +810,13 @@
             android:background="#FFFFFF"
             android:padding="16dp"
             android:layout_marginBottom="12dp">
-
             <ImageView
+                android:id="@+id/imgArmaduraDorada"
                 android:layout_width="140dp"
                 android:layout_height="120dp"
-                android:src="@drawable/Armadura"
+                android:src="@drawable/armadura"
                 android:scaleType="fitCenter"
                 android:contentDescription="Armadura dorada" />
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -899,7 +825,6 @@
                 android:textSize="19sp"
                 android:textStyle="bold"
                 android:gravity="center" />
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -908,7 +833,6 @@
                 android:textSize="16sp"
                 android:gravity="center"
                 android:padding="8dp" />
-
             <Button
                 android:id="@+id/btnCanjearArmaduraDorada"
                 android:layout_width="match_parent"
@@ -917,7 +841,6 @@
         </LinearLayout>
 
         <!-- Premio: Alas celestiales -->
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -926,14 +849,13 @@
             android:background="#FFFFFF"
             android:padding="16dp"
             android:layout_marginBottom="12dp">
-
             <ImageView
+                android:id="@+id/imgAlasCelestiales"
                 android:layout_width="140dp"
                 android:layout_height="120dp"
-                android:src="@drawable/Alas_celestiales"
+                android:src="@drawable/alas_celestiales"
                 android:scaleType="fitCenter"
                 android:contentDescription="Alas celestiales" />
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -942,7 +864,6 @@
                 android:textSize="19sp"
                 android:textStyle="bold"
                 android:gravity="center" />
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -951,7 +872,6 @@
                 android:textSize="16sp"
                 android:gravity="center"
                 android:padding="8dp" />
-
             <Button
                 android:id="@+id/btnCanjearAlasCelestiales"
                 android:layout_width="match_parent"
@@ -960,7 +880,6 @@
         </LinearLayout>
 
         <!-- Resultado del canje -->
-
         <TextView
             android:id="@+id/tvResultadoCanje"
             android:layout_width="match_parent"

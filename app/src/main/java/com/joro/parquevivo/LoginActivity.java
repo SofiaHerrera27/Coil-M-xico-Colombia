@@ -1,6 +1,8 @@
 package com.joro.parquevivo;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -14,10 +16,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private EditText etEmail, etPassword;
     private DatabaseHelper db;
-
-    // Instancia del ayudante de Drako
     private DrakoHelper drakoHelper;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,31 +24,26 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         db = new DatabaseHelper(this);
-
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
 
-        // Obtener los elementos del layout flotante de Drako
+        // --- LIMPIAR TRAJE AL INICIAR SESIÓN ---
+        // Esto asegura que si cierras la app y vuelves a entrar, Drako salga sin traje.
+        SharedPreferences prefs = getSharedPreferences("parque_prefs", Context.MODE_PRIVATE);
+        prefs.edit().remove("item_equipado").apply();
+        // --------------------------------------
+
         ImageView imgDrako = findViewById(R.id.imgDrako);
         TextView tvGlobo = findViewById(R.id.tvGlobo);
 
-        // Conectar a Drako con sus indicaciones en la pantalla LOGIN
-        drakoHelper = new DrakoHelper(
-                this,
-                imgDrako,
-                tvGlobo,
-                DrakoHelper.TipoPantalla.LOGIN
-        );
+        drakoHelper = new DrakoHelper(this, imgDrako, tvGlobo, DrakoHelper.TipoPantalla.LOGIN);
 
         Button btnLogin = findViewById(R.id.btnLogin);
         TextView tvIrRegistro = findViewById(R.id.tvIrRegistro);
 
         btnLogin.setOnClickListener(v -> iniciarSesion());
-
-        tvIrRegistro.setOnClickListener(v ->
-                startActivity(new Intent(this, RegisterActivity.class)));
+        tvIrRegistro.setOnClickListener(v -> startActivity(new Intent(this, RegisterActivity.class)));
     }
-
 
     private void iniciarSesion() {
         String email = etEmail.getText().toString().trim();
@@ -71,20 +65,19 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    //  MANEJO DE CICLO DE VIDA (Obligatorio para evitar errores) 
-
     @Override
     protected void onResume() {
         super.onResume();
-        drakoHelper.iniciar(); // Empieza a parpadear
+        if (drakoHelper != null) {
+            drakoHelper.iniciar();
+        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        drakoHelper.detener(); // Se pausa si el usuario sale o cambia de app
+        if (drakoHelper != null) {
+            drakoHelper.detener();
+        }
     }
-
-
-
 }

@@ -1,6 +1,8 @@
 package com.joro.parquevivo;
 
 import android.Manifest;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -547,7 +549,11 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
             colorHuntController.setScanningActive(false);
         }
 
-        ParquePuntos.agregarPuntos(this, PUNTOS_POR_RETO);
+        // CORREGIDO: Guardar los puntos directamente en SharedPreferences
+        // ya que la clase ParquePuntos no existe en el proyecto.
+        SharedPreferences preferencias = getSharedPreferences("parque_puntos", Context.MODE_PRIVATE);
+        int puntosActuales = preferencias.getInt("puntos", 0);
+        preferencias.edit().putInt("puntos", puntosActuales + PUNTOS_POR_RETO).apply();
 
         String mensaje = acertijoActual.getMensajeExito()
                 + "\n\n¡Ganaste " + PUNTOS_POR_RETO + " ParquePuntos!";

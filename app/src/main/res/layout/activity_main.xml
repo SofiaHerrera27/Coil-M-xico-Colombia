@@ -1,153 +1,131 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-xmlns:app="http://schemas.android.com/apk/res-auto"
-android:layout_width="match_parent"
-android:layout_height="match_parent"
-android:background="@color/pv_fondo">
-
-<ScrollView
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true">
+    android:background="@color/pv_fondo">
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="24dp"
-        android:paddingBottom="140dp">
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
-        <TextView
-            android:id="@+id/tvBienvenida"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/pv_verde_oscuro"
-            android:textSize="24sp"
-            android:textStyle="bold" />
-
-        <GridLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:columnCount="2">
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:paddingBottom="140dp">
 
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardCaza"
-                android:layout_width="0dp"
+            <TextView
+                android:id="@+id/tvBienvenida"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_columnWeight="1"
-                android:layout_margin="8dp"
-                android:clickable="true"
-                android:focusable="true"
-                app:cardCornerRadius="16dp">
+                android:textColor="@color/pv_verde_oscuro"
+                android:textSize="24sp"
+                android:textStyle="bold" />
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:padding="24dp"
-                    android:text="Caza de Colores"
-                    android:textColor="@color/pv_verde_oscuro"
-                    android:textStyle="bold" />
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardAlbum"
-                android:layout_width="0dp"
+            <GridLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_columnWeight="1"
-                android:layout_margin="8dp"
-                android:clickable="true"
-                android:focusable="true"
-                app:cardCornerRadius="16dp">
+                android:layout_marginTop="24dp"
+                android:columnCount="2">
 
-                <TextView
-                    android:layout_width="match_parent"
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardCaza"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:padding="24dp"
-                    android:text="Album"
-                    android:textColor="@color/pv_verde_oscuro"
-                    android:textStyle="bold" />
-            </com.google.android.material.card.MaterialCardView>
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardPuntos"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_columnWeight="1"
-                android:layout_margin="8dp"
-                android:clickable="true"
-                android:focusable="true"
-                app:cardCornerRadius="16dp">
+                    android:layout_columnWeight="1"
+                    android:layout_margin="8dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    app:cardCornerRadius="16dp">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:padding="24dp"
+                        android:text="Caza de Colores"
+                        android:textColor="@color/pv_verde_oscuro"
+                        android:textStyle="bold" />
+                </com.google.android.material.card.MaterialCardView>
 
-                <TextView
-                    android:layout_width="match_parent"
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardAlbum"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:padding="24dp"
-                    android:text="ParquePuntos"
-                    android:textColor="@color/pv_verde_oscuro"
-                    android:textStyle="bold" />
-            </com.google.android.material.card.MaterialCardView>
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardTrivia"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_columnWeight="1"
-                android:layout_margin="8dp"
-                android:clickable="true"
-                android:focusable="true"
-                app:cardCornerRadius="16dp">
+                    android:layout_columnWeight="1"
+                    android:layout_margin="8dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    app:cardCornerRadius="16dp">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:padding="24dp"
+                        android:text="Album"
+                        android:textColor="@color/pv_verde_oscuro"
+                        android:textStyle="bold" />
+                </com.google.android.material.card.MaterialCardView>
 
-                <TextView
-                    android:layout_width="match_parent"
+                <!-- SE ELIMINÓ LA TARJETA DE PARQUE PUNTOS AQUÍ -->
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardTrivia"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:padding="24dp"
-                    android:text="Trivia"
-                    android:textColor="@color/pv_verde_oscuro"
-                    android:textStyle="bold" />
-            </com.google.android.material.card.MaterialCardView>
+                    android:layout_columnWeight="1"
+                    android:layout_margin="8dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    app:cardCornerRadius="16dp">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:padding="24dp"
+                        android:text="Trivia"
+                        android:textColor="@color/pv_verde_oscuro"
+                        android:textStyle="bold" />
+                </com.google.android.material.card.MaterialCardView>
 
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardPremios"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_columnWeight="1"
-                android:layout_margin="8dp"
-                android:clickable="true"
-                android:focusable="true"
-                app:cardCornerRadius="16dp">
-
-                <TextView
-                    android:layout_width="match_parent"
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardPremios"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:padding="24dp"
-                    android:text="Premios"
-                    android:textColor="@color/pv_verde_oscuro"
-                    android:textStyle="bold" />
-            </com.google.android.material.card.MaterialCardView>
+                    android:layout_columnWeight="1"
+                    android:layout_margin="8dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    app:cardCornerRadius="16dp">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:padding="24dp"
+                        android:text="Premios"
+                        android:textColor="@color/pv_verde_oscuro"
+                        android:textStyle="bold" />
+                </com.google.android.material.card.MaterialCardView>
 
-        </GridLayout>
+            </GridLayout>
 
-        <Button
-            android:id="@+id/btnSalir"
-            android:layout_width="wrap_content"
-            android:layout_height="56dp"
-            android:layout_marginTop="24dp"
-            android:paddingStart="32dp"
-            android:paddingEnd="32dp"
-            android:text="Cerrar sesión"
-            android:layout_gravity="center_horizontal"
-            android:textAllCaps="false"
-            android:textColor="@color/pv_blanco"
-            android:textStyle="bold" />
-    </LinearLayout>
-</ScrollView>
+            <Button
+                android:id="@+id/btnSalir"
+                android:layout_width="wrap_content"
+                android:layout_height="56dp"
+                android:layout_marginTop="24dp"
+                android:paddingStart="32dp"
+                android:paddingEnd="32dp"
+                android:text="Cerrar sesión"
+                android:layout_gravity="center_horizontal"
+                android:textAllCaps="false"
+                android:textColor="@color/pv_blanco"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </ScrollView>
 
-<include layout="@layout/layout_drako_flotante" />
+    <include layout="@layout/layout_drako_flotante" />
 
 </FrameLayout>
-
-

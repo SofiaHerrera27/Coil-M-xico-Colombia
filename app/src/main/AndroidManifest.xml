@@ -46,10 +46,6 @@
             android:exported="false" />
 
         <activity
-            android:name=".ParquePuntos"
-            android:exported="false" />
-
-        <activity
             android:name=".Premio"
             android:exported="false" />
 
