@@ -80,8 +80,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         if (drakoHelper != null) {
-            // ¡ESTA ES LA MAGIA! Le decimos que relea el SharedPreferences y cambie el traje
+            // 1. Actualizamos la imagen (por si compró un traje nuevo)
             drakoHelper.actualizarTraje();
+            // 2. Iniciamos el bucle del parpadeo
             drakoHelper.iniciar();
         }
     }

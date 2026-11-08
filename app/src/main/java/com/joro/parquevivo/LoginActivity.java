@@ -27,11 +27,9 @@ public class LoginActivity extends AppCompatActivity {
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
 
-        // --- LIMPIAR TRAJE AL INICIAR SESIÓN ---
-        // Esto asegura que si cierras la app y vuelves a entrar, Drako salga sin traje.
+        // Forzamos a que el traje sea el base al iniciar sesión
         SharedPreferences prefs = getSharedPreferences("parque_prefs", Context.MODE_PRIVATE);
         prefs.edit().remove("item_equipado").apply();
-        // --------------------------------------
 
         ImageView imgDrako = findViewById(R.id.imgDrako);
         TextView tvGlobo = findViewById(R.id.tvGlobo);

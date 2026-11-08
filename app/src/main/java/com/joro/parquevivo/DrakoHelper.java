@@ -33,6 +33,8 @@ public class DrakoHelper {
     private Drawable medio;
     private Drawable cerrado;
 
+    private boolean puedeParpadear = false;
+
     private static final String PREFS_EQUIPAMIENTO = "parque_prefs";
     private static final String KEY_ITEM_EQUIPADO = "item_equipado";
 
@@ -48,7 +50,6 @@ public class DrakoHelper {
             indicesMensajes.put(tipoPantalla, 0);
         }
 
-        // Forzamos a que el contenedor de la imagen no tenga ningún fondo (ni negro, ni gris)
         if (this.imgDrako != null) {
             this.imgDrako.setBackgroundColor(Color.TRANSPARENT);
         }
@@ -62,52 +63,88 @@ public class DrakoHelper {
 
     public void actualizarTraje() {
         SharedPreferences prefs = context.getSharedPreferences(PREFS_EQUIPAMIENTO, Context.MODE_PRIVATE);
-        // Si no hay nada guardado, cargará el Drako base
         String itemEquipado = prefs.getString(KEY_ITEM_EQUIPADO, "default");
 
-        int idDrawable;
+        int idAbierto = R.drawable.drako;
+        String nombreDrawableBase = "drako";
+
+        // Mapeo de los trajes (Nombre base para buscar los _medio y _cerrados)
+        // NOTA: Se eliminó cualquier referencia a drago_guerrero
         switch (itemEquipado) {
-            case "sombrero_explorador": idDrawable = R.drawable.dragon_sombrero; break;
-            case "gorra_guardabosques": idDrawable = R.drawable.drago_guardab; break;
-            case "mochila_exploradora": idDrawable = R.drawable.drago_mochila; break;
-            case "brujula_dorada": idDrawable = R.drawable.drago_brujula; break;
-            case "mariposa_magica": idDrawable = R.drawable.drago_mariposa; break;
-            case "sombrero_mago": idDrawable = R.drawable.drago_smago; break;
-            case "cristal_energia": idDrawable = R.drawable.drago_cristal; break;
-            case "zorrito_bosque": idDrawable = R.drawable.drago_zorro; break;
-            case "buho_sabio": idDrawable = R.drawable.drago_buho; break;
-            case "medalla_ecologica": idDrawable = R.drawable.drago_medalla; break;
-            case "corona_dorada": idDrawable = R.drawable.drago_corona; break;
-            case "alas_magicas": idDrawable = R.drawable.drago_alas_mariposa; break;
-            case "dragon_bebe": idDrawable = R.drawable.drago_bebe; break;
-            case "tunica_magica": idDrawable = R.drawable.drago_tunica; break;
-            case "guardian_bosque": idDrawable = R.drawable.drago_guardian; break;
-            case "traje_aventurero": idDrawable = R.drawable.drago_aventurero; break;
-            case "varita_natural": idDrawable = R.drawable.drago_varita; break;
-            case "cofre_misterioso": idDrawable = R.drawable.drago_cofre; break;
-            case "armadura_dorada": idDrawable = R.drawable.drago_armadura_caballero; break;
-            case "alas_celestiales": idDrawable = R.drawable.drago_alas_doradas; break;
-            default:
-                idDrawable = R.drawable.drako; // Drako sin traje por defecto
-                break;
+            case "sombrero_explorador": idAbierto = R.drawable.dragon_sombrero; nombreDrawableBase = "dragon_sombrero"; break;
+            case "gorra_guardabosques": idAbierto = R.drawable.drago_guardab; nombreDrawableBase = "drago_guardab"; break;
+            case "mochila_exploradora": idAbierto = R.drawable.drago_mochila; nombreDrawableBase = "drago_mochila"; break;
+            case "brujula_dorada": idAbierto = R.drawable.drago_brujula; nombreDrawableBase = "drago_brujula"; break;
+            case "mariposa_magica": idAbierto = R.drawable.drago_mariposa; nombreDrawableBase = "drago_mariposa"; break;
+            case "sombrero_mago": idAbierto = R.drawable.drago_smago; nombreDrawableBase = "drago_smago"; break;
+            case "cristal_energia": idAbierto = R.drawable.drago_cristal; nombreDrawableBase = "drago_cristal"; break;
+            case "zorrito_bosque": idAbierto = R.drawable.drago_zorro; nombreDrawableBase = "drago_zorro"; break;
+            case "buho_sabio": idAbierto = R.drawable.drago_buho; nombreDrawableBase = "drago_buho"; break;
+            case "medalla_ecologica": idAbierto = R.drawable.drago_medalla; nombreDrawableBase = "drago_medalla"; break;
+            case "corona_dorada": idAbierto = R.drawable.drago_corona; nombreDrawableBase = "drago_corona"; break;
+            case "alas_magicas": idAbierto = R.drawable.drago_alas_mariposa; nombreDrawableBase = "drago_alas_mariposa"; break;
+            case "dragon_bebe": idAbierto = R.drawable.drago_bebe; nombreDrawableBase = "drago_bebe"; break;
+            case "tunica_magica": idAbierto = R.drawable.drago_tunica; nombreDrawableBase = "drago_tunica"; break;
+            case "guardian_bosque": idAbierto = R.drawable.drago_guardian; nombreDrawableBase = "drago_guardian"; break;
+            case "traje_aventurero": idAbierto = R.drawable.drago_aventurero; nombreDrawableBase = "drago_aventurero"; break;
+            case "varita_natural": idAbierto = R.drawable.drago_varita; nombreDrawableBase = "drago_varita"; break;
+            case "cofre_misterioso": idAbierto = R.drawable.drago_cofre; nombreDrawableBase = "drago_cofre"; break;
+            case "armadura_dorada": idAbierto = R.drawable.drago_armadura_caballero; nombreDrawableBase = "drago_armadura_caballero"; break;
+            case "alas_celestiales": idAbierto = R.drawable.drago_alas_doradas; nombreDrawableBase = "drago_alas_doradas"; break;
         }
 
-        Drawable trajeSeleccionado = ContextCompat.getDrawable(context, idDrawable);
+        if (itemEquipado.equals("default")) {
+            // Configuración para el Drako base
+            puedeParpadear = true;
+            abierto = ContextCompat.getDrawable(context, R.drawable.drako);
+            medio = ContextCompat.getDrawable(context, R.drawable.drako_medio);
+            cerrado = ContextCompat.getDrawable(context, R.drawable.drako_cerrado);
+        } else {
+            // Configuración para trajes
+            abierto = ContextCompat.getDrawable(context, idAbierto);
 
-        abierto = trajeSeleccionado;
-        medio = trajeSeleccionado;
-        cerrado = trajeSeleccionado;
+            // Buscamos dinámicamente las imágenes _medio y _cerrados (en plural)
+            int idMedio = context.getResources().getIdentifier(nombreDrawableBase + "_medio", "drawable", context.getPackageName());
+            int idCerrado = context.getResources().getIdentifier(nombreDrawableBase + "_cerrados", "drawable", context.getPackageName());
 
-        if (imgDrako != null) {
+            // Si por alguna razón en el futuro la nombras en singular (_cerrado), hacemos un respaldo
+            if (idCerrado == 0) {
+                idCerrado = context.getResources().getIdentifier(nombreDrawableBase + "_cerrado", "drawable", context.getPackageName());
+            }
+
+            if (idMedio != 0 && idCerrado != 0) {
+                // ¡Encontró las imágenes! Activamos el parpadeo para este traje
+                medio = ContextCompat.getDrawable(context, idMedio);
+                cerrado = ContextCompat.getDrawable(context, idCerrado);
+                puedeParpadear = true;
+            } else {
+                // No hay imágenes de parpadeo para este traje, se queda quieto
+                medio = abierto;
+                cerrado = abierto;
+                puedeParpadear = false;
+            }
+        }
+
+        if (imgDrako != null && abierto != null) {
             imgDrako.setImageDrawable(abierto);
         }
     }
 
     private void parpadear(int paso) {
         if (imgDrako == null) return;
+
+        // Si no tiene las imágenes de parpadeo, espera al siguiente ciclo sin hacer nada
+        if (!puedeParpadear) {
+            programarSiguiente();
+            return;
+        }
+
         Drawable[] frames = {medio, cerrado, medio, abierto};
         long[] pausas = {50, 70, 50};
-        imgDrako.setImageDrawable(frames[paso]);
+
+        if (frames[paso] != null) {
+            imgDrako.setImageDrawable(frames[paso]);
+        }
 
         if (paso < frames.length - 1) {
             handler.postDelayed(() -> parpadear(paso + 1), pausas[paso]);
@@ -117,6 +154,7 @@ public class DrakoHelper {
     }
 
     private void programarSiguiente() {
+        // Espera entre 2.5 y 6 segundos para el próximo parpadeo
         handler.postDelayed(() -> parpadear(0), random.nextInt(3500) + 2500);
     }
 
@@ -134,7 +172,7 @@ public class DrakoHelper {
     public void detener() {
         handler.removeCallbacksAndMessages(null);
         if (imgDrako != null && abierto != null) {
-            imgDrako.setImageDrawable(abierto);
+            imgDrako.setImageDrawable(abierto); // Asegura que se quede con los ojos abiertos
         }
     }
 
