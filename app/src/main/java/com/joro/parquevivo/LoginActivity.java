@@ -77,8 +77,12 @@ public class LoginActivity extends AppCompatActivity {
 
         String nombre = db.validarLogin(email, password);
         if (nombre != null) {
+            // Obtener el ID del usuario correspondiente a este correo
+            long usuarioId = db.obtenerIdUsuario(email);
+
             Intent intent = new Intent(this, MainActivity.class);
             intent.putExtra("nombre", nombre);
+            intent.putExtra("usuario_id", usuarioId); // Sincronización requerida para el Álbum
             startActivity(intent);
             finish();
         } else {

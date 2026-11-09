@@ -36,7 +36,8 @@ public class DrakoHelper implements TextToSpeech.OnInitListener {
         CAZA_COLORES,
         ALBUM,
         TRIVIA,
-        PREMIOS
+        PREMIOS,
+        CANJE
     }
 
     private final Context context;
@@ -46,9 +47,10 @@ public class DrakoHelper implements TextToSpeech.OnInitListener {
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final Random random = new Random();
 
-    private final Drawable abierto;
-    private final Drawable medio;
-    private final Drawable cerrado;
+    // Sprites de parpadeo (Cambiados a no-finales para actualizar con cada traje)
+    private Drawable abierto;
+    private Drawable medio;
+    private Drawable cerrado;
 
     private static final Map<TipoPantalla, Integer> indicesMensajes = new HashMap<>();
 
@@ -62,21 +64,167 @@ public class DrakoHelper implements TextToSpeech.OnInitListener {
         this.tvGlobo = tvGlobo;
         this.tipoPantalla = tipoPantalla;
 
-        abierto = ContextCompat.getDrawable(context, R.drawable.drako);
-        medio = ContextCompat.getDrawable(context, R.drawable.drako_medio);
-        cerrado = ContextCompat.getDrawable(context, R.drawable.drako_cerrado);
+        // Carga la vestimenta inicial de Drako guardada en el progreso
+        cargarSpritesSegunTraje();
 
         if (!indicesMensajes.containsKey(tipoPantalla)) {
             indicesMensajes.put(tipoPantalla, 0);
         }
 
         if (this.imgDrako != null) {
-            // Asigna el nuevo método de control con anti-spam
             this.imgDrako.setOnClickListener(v -> alHacerClickEnDrako());
         }
 
         // Inicializar motor de voz TTS
         tts = new TextToSpeech(context.getApplicationContext(), this);
+    }
+
+    /**
+     * Revisa en ProgresoManager cuál traje está equipado y asigna las imágenes correspondientes.
+     */
+    public void cargarSpritesSegunTraje() {
+        ProgresoManager progreso = new ProgresoManager(context);
+        String traje = progreso.getTrajeEquipado().toLowerCase().trim();
+
+        int resAbierto;
+        int resMedio;
+        int resCerrado;
+
+        switch (traje) {
+            case "sombrero_explorador":
+                resAbierto = R.drawable.dragon_sombrero;
+                resMedio = R.drawable.dragon_sombrero_medio;
+                resCerrado = R.drawable.dragon_sombrero_cerrados;
+                break;
+
+            case "gorra_guardabosques":
+                resAbierto = R.drawable.drago_guardab;
+                resMedio = R.drawable.drago_guardab_medio;
+                resCerrado = R.drawable.drago_guardab_cerrados;
+                break;
+
+            case "mochila_exploradora":
+                resAbierto = R.drawable.drago_mochila;
+                resMedio = R.drawable.drago_mochila_medio;
+                resCerrado = R.drawable.drago_mochila_cerrados;
+                break;
+
+            case "brujula_dorada":
+                resAbierto = R.drawable.drago_brujula;
+                resMedio = R.drawable.drago_brujula_medio;
+                resCerrado = R.drawable.drago_brujula_cerrados;
+                break;
+
+            case "mariposa_magica":
+                resAbierto = R.drawable.drago_mariposa;
+                resMedio = R.drawable.drago_mariposa_medio;
+                resCerrado = R.drawable.drago_mariposa_cerrados;
+                break;
+
+            case "sombrero_mago":
+                resAbierto = R.drawable.drago_smago;
+                resMedio = R.drawable.drago_smago_medio;
+                resCerrado = R.drawable.drago_smago_cerrados;
+                break;
+
+            case "cristal_energia":
+                resAbierto = R.drawable.drago_cristal;
+                resMedio = R.drawable.drago_cristal_medio;
+                resCerrado = R.drawable.drago_cristal_cerrados;
+                break;
+
+            case "zorrito_bosque":
+                resAbierto = R.drawable.drago_zorro;
+                resMedio = R.drawable.drago_zorro_medio;
+                resCerrado = R.drawable.drago_zorro_cerrados;
+                break;
+
+            case "buho_sabio":
+                resAbierto = R.drawable.drago_buho;
+                resMedio = R.drawable.drago_buho_medio;
+                resCerrado = R.drawable.drago_buho_cerrados;
+                break;
+
+            case "medalla_ecologica":
+                resAbierto = R.drawable.drago_medalla;
+                resMedio = R.drawable.drago_medalla_medio;
+                resCerrado = R.drawable.drago_medalla_cerrados;
+                break;
+
+            case "corona_dorada":
+                resAbierto = R.drawable.drago_corona;
+                resMedio = R.drawable.drago_corona_medio;
+                resCerrado = R.drawable.drago_corona_cerrados;
+                break;
+
+            case "alas_magicas":
+                resAbierto = R.drawable.drago_alas_mariposa;
+                resMedio = R.drawable.drago_alas_mariposa_medio;
+                resCerrado = R.drawable.drago_alas_mariposa_cerrados;
+                break;
+
+            case "dragon_bebe":
+                resAbierto = R.drawable.drago_bebe;
+                resMedio = R.drawable.drago_bebe_medio;
+                resCerrado = R.drawable.drago_bebe_cerrados;
+                break;
+
+            case "tunica_magica":
+                resAbierto = R.drawable.drago_tunica;
+                resMedio = R.drawable.drago_tunica_medio;
+                resCerrado = R.drawable.drago_tunica_cerrados;
+                break;
+
+            case "guardian_bosque":
+                resAbierto = R.drawable.drago_guardian;
+                resMedio = R.drawable.drago_guardian_medio;
+                resCerrado = R.drawable.drago_guardian_cerrados;
+                break;
+
+            case "traje_aventurero":
+                resAbierto = R.drawable.drago_aventurero;
+                resMedio = R.drawable.drago_aventurero_medio;
+                resCerrado = R.drawable.drago_aventurero_cerrados;
+                break;
+
+            case "varita_natural":
+                resAbierto = R.drawable.drago_varita;
+                resMedio = R.drawable.drago_varita_medio;
+                resCerrado = R.drawable.drago_varita_cerrados;
+                break;
+
+            case "cofre_misterioso":
+                resAbierto = R.drawable.drago_cofre;
+                resMedio = R.drawable.drago_cofre_medio;
+                resCerrado = R.drawable.drago_cofre_cerrados;
+                break;
+
+            case "armadura_dorada":
+                resAbierto = R.drawable.drago_armadura_caballero;
+                resMedio = R.drawable.drago_armadura_caballero_medio;
+                resCerrado = R.drawable.drago_armadura_caballero_cerrados;
+                break;
+
+            case "alas_celestiales":
+                resAbierto = R.drawable.drago_alas_doradas;
+                resMedio = R.drawable.drago_alas_doradas_medio;
+                resCerrado = R.drawable.drago_alas_doradas_cerrados;
+                break;
+
+            default:
+                resAbierto = R.drawable.drako;
+                resMedio = R.drawable.drako_medio;
+                resCerrado = R.drawable.drako_cerrado;
+                break;
+        }
+
+        abierto = ContextCompat.getDrawable(context, resAbierto);
+        medio = ContextCompat.getDrawable(context, resMedio);
+        cerrado = ContextCompat.getDrawable(context, resCerrado);
+
+        if (abierto == null) abierto = ContextCompat.getDrawable(context, R.drawable.drako);
+        if (medio == null) medio = ContextCompat.getDrawable(context, R.drawable.drako_medio);
+        if (cerrado == null) cerrado = ContextCompat.getDrawable(context, R.drawable.drako_cerrado);
     }
 
     @Override
@@ -109,7 +257,6 @@ public class DrakoHelper implements TextToSpeech.OnInitListener {
                     }
                 });
 
-                // Reproduce el texto del globo que ya estaba visible al abrir la pantalla
                 if (tvGlobo != null && tvGlobo.getVisibility() == View.VISIBLE) {
                     String textoInicial = tvGlobo.getText().toString();
                     if (!textoInicial.isEmpty()) {
@@ -125,15 +272,12 @@ public class DrakoHelper implements TextToSpeech.OnInitListener {
         long tiempoActual = SystemClock.elapsedRealtime();
         long tiempoTranscurrido = tiempoActual - ultimoClickTime;
 
-        // Detectar si están presionando muy rápido (menos de 1.2 segundos entre toques)
         if (tiempoTranscurrido < 1200) {
             contadorClicksRapidos++;
         } else if (tiempoTranscurrido > 3000) {
-            // Si pasan más de 3 segundos se reinicia el conteo
             contadorClicksRapidos = 0;
         }
 
-        // Si lo presionan 3 o más veces seguidas muy rápido
         if (contadorClicksRapidos >= 3) {
             ultimoClickTime = tiempoActual;
             contadorClicksRapidos = 0;
@@ -141,9 +285,8 @@ public class DrakoHelper implements TextToSpeech.OnInitListener {
             return;
         }
 
-        // Bloquear toques normales durante el tiempo de espera (cooldown)
         if (tiempoTranscurrido < TIEMPO_ENTRE_HABLA_MS) {
-            return; // Ignora el clic silenciosamente para no congelar ni saturar la voz
+            return;
         }
 
         ultimoClickTime = tiempoActual;
@@ -164,7 +307,7 @@ public class DrakoHelper implements TextToSpeech.OnInitListener {
         mostrarTextoEspecial(frase);
     }
 
-    // PARPADEO
+    // PARPADEO CORREGIDO
     private void parpadear(int paso) {
         Drawable[] frames = {medio, cerrado, medio, abierto};
         long[] pausas = {50, 70, 50};
@@ -173,6 +316,7 @@ public class DrakoHelper implements TextToSpeech.OnInitListener {
 
         imgDrako.setImageDrawable(frames[paso]);
 
+        // Sintaxis corregida: (paso < frames.length - 1)
         if (paso < frames.length - 1) {
             handler.postDelayed(() -> parpadear(paso + 1), pausas[paso]);
         } else {
@@ -185,12 +329,14 @@ public class DrakoHelper implements TextToSpeech.OnInitListener {
     }
 
     public void iniciar() {
+        cargarSpritesSegunTraje(); // Refresca las imágenes por si se cambió de traje recientemente
         handler.removeCallbacksAndMessages(null);
         darConsejoOSaludo();
         handler.postDelayed(() -> parpadear(0), 1500);
     }
 
     public void iniciarSinSaludo() {
+        cargarSpritesSegunTraje();
         handler.removeCallbacksAndMessages(null);
         handler.postDelayed(() -> parpadear(0), 1500);
     }
@@ -203,19 +349,16 @@ public class DrakoHelper implements TextToSpeech.OnInitListener {
         }
     }
 
-    // Método para leer cualquier texto mediante TTS
     public void hablar(String texto) {
         detenerVoz();
         if (texto == null || texto.trim().isEmpty()) return;
 
         if (ttsListo && tts != null) {
-            // Quita emojis y símbolos que interrumplan la lectura
             String textoLimpio = texto.replaceAll("[^\\p{L}\\p{N}\\p{P}\\p{Z}]", "").trim();
             tts.speak(textoLimpio, TextToSpeech.QUEUE_FLUSH, null, "drako_speech");
         }
     }
 
-    // Permite reproducir audios grabados manualmente de res/raw/
     public void reproducirVozLocal(int rawId) {
         detenerVoz();
         if (rawId == 0) return;
@@ -248,7 +391,6 @@ public class DrakoHelper implements TextToSpeech.OnInitListener {
         }
     }
 
-    // MENSAJES
     private String[] obtenerMensajes() {
         switch (tipoPantalla) {
             case LOGIN:
@@ -297,10 +439,16 @@ public class DrakoHelper implements TextToSpeech.OnInitListener {
                 };
             case PREMIOS:
                 return new String[]{
-                        "¡Mira todas las recompensas que puedes canjear con tus puntos!",
-                        "Sigue jugando en las distintas actividades para acumular más puntos.",
-                        "¡Muéstrale a tus amigos y familia todos tus logros en el parque!",
-                        "¡Alcanzar niveles altos desbloquea medallas especiales!"
+                        "¡Mira todas las criaturas 3D que has desbloqueado!",
+                        "Toca cualquier dragón para ver su historia o escucharlo hablar.",
+                        "¡Presiona el botón de RA para traerlo al mundo real!",
+                        "¡Sigue participando para coleccionar a los 7 guardianes!"
+                };
+            case CANJE:
+                return new String[]{
+                        "¡Bienvenido a la Tienda de ParquePuntos!",
+                        "¡Usa los puntos que has ganado para vestir a Drako con nuevos accesorios!",
+                        "¡Cada prenda o accesorio se equipará automáticamente en Drako!"
                 };
             default:
                 return new String[]{"¡Hola! Soy Drako, tu guía en ParqueVivo."};
@@ -316,7 +464,7 @@ public class DrakoHelper implements TextToSpeech.OnInitListener {
         String textoAMostrar = mensajes[indexActual];
 
         tvGlobo.setText(textoAMostrar);
-        tvGlobo.setAlpha(0.85f); // Transparencia
+        tvGlobo.setAlpha(0.85f);
         tvGlobo.setVisibility(View.VISIBLE);
 
         hablar(textoAMostrar);
@@ -328,7 +476,7 @@ public class DrakoHelper implements TextToSpeech.OnInitListener {
     public void mostrarTextoEspecial(String texto) {
         if (tvGlobo != null) {
             tvGlobo.setText(texto);
-            tvGlobo.setAlpha(0.85f); // Transparencia
+            tvGlobo.setAlpha(0.85f);
             tvGlobo.setVisibility(View.VISIBLE);
             hablar(texto);
         }

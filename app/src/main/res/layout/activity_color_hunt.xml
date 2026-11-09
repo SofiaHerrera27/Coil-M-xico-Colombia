@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000">
+
+    <!-- Vista previa de la cámara (CameraX / SurfaceView) -->
+    <androidx.camera.view.PreviewView
+        android:id="@+id/viewFinder"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- Encabezado Flotante: Botón Cerrar y Tarjeta de Instrucciones Dinámicas -->
+    <LinearLayout
+        android:id="@+id/headerColorHunt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_margin="16dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/btnCerrarColorHunt"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/bg_dialog_redondeado"
+            android:backgroundTint="#99000000"
+            android:contentDescription="Cerrar Caza de Colores"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            app:tint="#FFFFFF" />
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            app:cardBackgroundColor="#E61B4332"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="6dp">
+
+            <TextView
+                android:id="@+id/tvInstrucciones"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:padding="14dp"
+                android:text="Busca y enfoca un objeto de color Rojo..."
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+        </androidx.cardview.widget.CardView>
+    </LinearLayout>
+
+    <!-- Retícula Central de Escáner de Color -->
+    <View
+        android:id="@+id/reticulaEscaner"
+        android:layout_width="160dp"
+        android:layout_height="160dp"
+        android:layout_centerInParent="true"
+        android:background="@drawable/bg_dialog_redondeado"
+        android:backgroundTint="#33FFFFFF" />
+
+    <!-- Cabecita del Dragón (Pop-up Interactivo para el Toque Rápido) -->
+    <ImageView
+        android:id="@+id/imgCabezaDragon"
+        android:layout_width="140dp"
+        android:layout_height="140dp"
+        android:layout_centerInParent="true"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:contentDescription="Toca a Drako rápidamente"
+        android:elevation="12dp"
+        android:focusable="true"
+        android:scaleType="fitCenter"
+        android:src="@drawable/drako"
+        android:visibility="gone" />
+
+</RelativeLayout>

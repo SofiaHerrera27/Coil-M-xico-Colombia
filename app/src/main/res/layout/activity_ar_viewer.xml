@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000">
+
+    <io.github.sceneview.ar.ArSceneView
+        android:id="@+id/arSceneView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- Botón Cerrar (Esquina superior izquierda) -->
+    <ImageButton
+        android:id="@+id/btnCerrarAR"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_margin="16dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Cerrar RA"
+        android:src="@android:drawable/ic_menu_close_clear_cancel" />
+
+    <!-- Botón Captura para el Álbum de Aventuras (Abajo al centro) -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/btnTomarFoto"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="36dp"
+        android:contentDescription="Tomar Foto AR"
+        android:src="@android:drawable/ic_menu_camera"
+        app:backgroundTint="#FFFFFF"
+        app:fabCustomSize="64dp"
+        app:maxImageSize="32dp"
+        app:tint="#1B4332" />
+
+</RelativeLayout>

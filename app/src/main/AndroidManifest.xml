@@ -2,13 +2,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- 1. PERMISOS DE CÁMARA (Obligatorios para CameraX) -->
+    <!-- PERMISOS DE CÁMARA Y HARDWARE -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-feature android:name="android.hardware.camera" android:required="true"/>
     <uses-feature android:name="android.hardware.camera.ar" android:required="false" />
+    <uses-feature android:name="android.hardware.sensor.gyroscope" android:required="false" />
 
-
-    <!-- 2. SERVICIO DE VOZ TTS PARA DRAKO (Evita bloqueos de seguridad en Android 11+) -->
+    <!-- SERVICIO DE VOZ TTS PARA DRAKO -->
     <queries>
         <intent>
             <action android:name="android.intent.action.TTS_SERVICE" />
@@ -27,7 +27,7 @@
 
         <meta-data android:name="com.google.ar.core" android:value="optional" />
 
-        <!-- Pantalla de inicio de la aplicación -->
+        <!-- Pantalla de inicio -->
         <activity
             android:name=".LoginActivity"
             android:exported="true">
@@ -37,11 +37,39 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".PremiosActivity" android:exported="false" />
         <activity android:name=".RegisterActivity" android:exported="false" />
         <activity android:name=".MainActivity" android:exported="false" />
-        <activity android:name=".Acertijo_Caza_Colores" android:exported="false"
+
+        <!-- TU SECCIÓN: Colección 3D de Dragones, Animaciones y Voces TTS -->
+        <activity
+            android:name=".PremiosActivity"
+            android:exported="false"
             android:screenOrientation="portrait" />
+
+        <!-- SECCIÓN DE TU COMPAÑERA: Canje de Puntos y Catálogo -->
+        <activity
+            android:name=".Premio"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <!-- ÁLBUM DE FOTOS / CAPTURAS -->
+        <activity
+            android:name=".AlbumActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <!-- CAZA DE COLORES -->
+        <activity
+            android:name=".Acertijo_Caza_Colores"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <!-- VISOR DE REALIDAD AUMENTADA -->
+        <activity
+            android:name=".ARViewerActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.NoActionBar" />
 
     </application>
 

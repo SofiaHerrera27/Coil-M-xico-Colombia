@@ -50,9 +50,9 @@
                     android:layout_margin="8dp"
                     android:clickable="true"
                     android:focusable="true"
+                    app:cardBackgroundColor="#CCFFFFFF"
                     app:cardCornerRadius="16dp"
-                    app:cardElevation="4dp"
-                    app:cardBackgroundColor="#CCFFFFFF">
+                    app:cardElevation="4dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -80,7 +80,7 @@
 
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- Tarjeta 2: Álbum -->
+                <!-- Tarjeta 2: Álbum de Aventuras -->
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardAlbum"
                     android:layout_width="0dp"
@@ -89,9 +89,9 @@
                     android:layout_margin="8dp"
                     android:clickable="true"
                     android:focusable="true"
+                    app:cardBackgroundColor="#CCFFFFFF"
                     app:cardCornerRadius="16dp"
-                    app:cardElevation="4dp"
-                    app:cardBackgroundColor="#CCFFFFFF">
+                    app:cardElevation="4dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -118,7 +118,7 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- Tarjeta 3: ParquePuntos -->
+                <!-- Tarjeta 3: ParquePuntos / Canje -->
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardPuntos"
                     android:layout_width="0dp"
@@ -127,9 +127,9 @@
                     android:layout_margin="8dp"
                     android:clickable="true"
                     android:focusable="true"
+                    app:cardBackgroundColor="#CCFFFFFF"
                     app:cardCornerRadius="16dp"
-                    app:cardElevation="4dp"
-                    app:cardBackgroundColor="#CCFFFFFF">
+                    app:cardElevation="4dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -157,45 +157,7 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- Tarjeta 4: Trivia -->
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/cardTrivia"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="8dp"
-                    android:clickable="true"
-                    android:focusable="true"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="4dp"
-                    app:cardBackgroundColor="#CCFFFFFF">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:padding="12dp">
-
-                        <ImageView
-                            android:layout_width="60dp"
-                            android:layout_height="60dp"
-                            android:adjustViewBounds="true"
-                            android:scaleType="fitCenter"
-                            android:src="@drawable/ic_trivia" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:gravity="center"
-                            android:text="Trivia"
-                            android:textColor="@color/pv_verde_oscuro"
-                            android:textStyle="bold" />
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-                <!-- Tarjeta 5: Premios -->
+                <!-- Tarjeta 4: Premios -->
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardPremios"
                     android:layout_width="0dp"
@@ -204,9 +166,9 @@
                     android:layout_margin="8dp"
                     android:clickable="true"
                     android:focusable="true"
+                    app:cardBackgroundColor="#CCFFFFFF"
                     app:cardCornerRadius="16dp"
-                    app:cardElevation="4dp"
-                    app:cardBackgroundColor="#CCFFFFFF">
+                    app:cardElevation="4dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -255,7 +217,7 @@
         app:backgroundTint="#CC1B5E20"
         app:cornerRadius="12dp" />
 
-    <!-- Capa 4 (Botón Música arriba a la derecha, listo para imágenes de césped) -->
+    <!-- Capa 4 (Botón Música arriba a la derecha) -->
     <ImageButton
         android:id="@+id/btnMusicaToggle"
         android:layout_width="48dp"

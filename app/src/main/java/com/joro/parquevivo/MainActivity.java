@@ -2,6 +2,7 @@ package com.joro.parquevivo;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -11,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
     private DrakoHelper drakoHelper;
+    private long usuarioId = 1; // ID de usuario por defecto
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,6 +21,12 @@ public class MainActivity extends AppCompatActivity {
 
         String nombre = getIntent().getStringExtra("nombre");
         if (nombre == null) nombre = "Explorador";
+
+        // Recuperar usuario_id proveniente del Login
+        long idRecibido = getIntent().getLongExtra("usuario_id", -1);
+        if (idRecibido != -1) {
+            usuarioId = idRecibido;
+        }
 
         TextView tvBienvenida = findViewById(R.id.tvBienvenida);
         if (tvBienvenida != null) {
@@ -34,42 +42,43 @@ public class MainActivity extends AppCompatActivity {
                 tvGlobo,
                 DrakoHelper.TipoPantalla.INICIO
         );
-        ImageButton btnMusicaToggle = findViewById(R.id.btnMusicaToggle);
 
-// 1. Asignar imagen inicial según el estado actual
-        if (MusicaManager.isMusicaHabilitada()) {
-            btnMusicaToggle.setImageResource(R.drawable.ic_music_on);
-        } else {
-            btnMusicaToggle.setImageResource(R.drawable.ic_music_off);
+        ImageButton btnMusicaToggle = findViewById(R.id.btnMusicaToggle);
+        if (btnMusicaToggle != null) {
+            btnMusicaToggle.setImageResource(MusicaManager.isMusicaHabilitada() ? R.drawable.ic_music_on : R.drawable.ic_music_off);
+            btnMusicaToggle.setOnClickListener(v -> {
+                boolean estaActiva = MusicaManager.toggleMusica(this);
+                btnMusicaToggle.setImageResource(estaActiva ? R.drawable.ic_music_on : R.drawable.ic_music_off);
+            });
         }
 
-// 2. Escuchar el clic para pausar o encender
-        btnMusicaToggle.setOnClickListener(v -> {
-            boolean estaActiva = MusicaManager.toggleMusica(this);
-
-            if (estaActiva) {
-                btnMusicaToggle.setImageResource(R.drawable.ic_music_on);
-            } else {
-                btnMusicaToggle.setImageResource(R.drawable.ic_music_off);
-            }
+        // 1. SECCIÓN CAZA DE COLORES
+        findViewById(R.id.cardCaza).setOnClickListener(v -> {
+            Intent intent = new Intent(this, Acertijo_Caza_Colores.class);
+            intent.putExtra("usuario_id", usuarioId);
+            startActivity(intent);
         });
 
-        // 1. Navegación a las actividades activas
-        findViewById(R.id.cardCaza).setOnClickListener(v ->
-                startActivity(new Intent(this, Acertijo_Caza_Colores.class)));
+        // 2. SECCIÓN PREMIOS (TU SECCIÓN: Colección de Dragones 3D)
+        findViewById(R.id.cardPremios).setOnClickListener(v -> {
+            Intent intent = new Intent(this, PremiosActivity.class);
+            intent.putExtra("usuario_id", usuarioId);
+            startActivity(intent);
+        });
 
-        findViewById(R.id.cardPremios).setOnClickListener(v ->
-                startActivity(new Intent(this, PremiosActivity.class)));
+        // 3. SECCIÓN ÁLBUM DE AVENTURAS
+        findViewById(R.id.cardAlbum).setOnClickListener(v -> {
+            Intent intent = new Intent(this, AlbumActivity.class);
+            intent.putExtra("usuario_id", usuarioId);
+            startActivity(intent);
+        });
 
-        // 2. Secciones en desarrollo
-        findViewById(R.id.cardAlbum).setOnClickListener(v ->
-                drakoHelper.mostrarTextoEspecial("¡Tu álbum llegará muy pronto!"));
-
-        findViewById(R.id.cardPuntos).setOnClickListener(v ->
-                drakoHelper.mostrarTextoEspecial("¡Pronto verás tus ParquePuntos aquí!"));
-
-        findViewById(R.id.cardTrivia).setOnClickListener(v ->
-                drakoHelper.mostrarTextoEspecial("¡La trivia está en construcción!"));
+        // 4. SECCIÓN CANJE DE PUNTOS (SECCIÓN DE TU COMPAÑERA: Premio.class)
+        findViewById(R.id.cardPuntos).setOnClickListener(v -> {
+            Intent intent = new Intent(this, Premio.class);
+            intent.putExtra("usuario_id", usuarioId);
+            startActivity(intent);
+        });
 
         Button btnSalir = findViewById(R.id.btnSalir);
         if (btnSalir != null) {
@@ -86,14 +95,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // Carga la pista de ambiente general
+        MusicaManager.init(this);
         MusicaManager.reanudar(this, MusicaManager.Pista.AMBIENTE);
 
         if (drakoHelper != null) {
-            drakoHelper.iniciar();   // Muestra mensaje y activa parpadeo
+            drakoHelper.iniciar();
         }
 
-        // Actualizar ParquePuntos acumulados en tiempo real
         ProgresoManager progreso = new ProgresoManager(this);
         TextView tvPuntosMenu = findViewById(R.id.tvPuntosCard);
         if (tvPuntosMenu != null) {
@@ -106,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
         MusicaManager.pausar();
         if (drakoHelper != null) {
-            drakoHelper.detener();   // Cancela animaciones y audio de Drako al salir
+            drakoHelper.detener();
         }
     }
 }

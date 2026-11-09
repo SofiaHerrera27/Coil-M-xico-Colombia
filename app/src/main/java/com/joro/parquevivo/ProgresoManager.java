@@ -8,11 +8,11 @@ public class ProgresoManager {
     private static final String PREF_NAME = "ParqueVivoProgreso";
     private static final String KEY_PUNTOS = "parque_puntos_totales";
     private static final String PREFIX_DESBLOQUEADO = "desbloqueado_";
+    private static final String KEY_TRAJE_EQUIPADO = "traje_equipado";
 
     private final SharedPreferences prefs;
 
     public ProgresoManager(Context context) {
-        // Se asegura de usar el contexto global de la aplicación
         Context appCtx = context != null ? context.getApplicationContext() : context;
         this.prefs = appCtx.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
     }
@@ -32,11 +32,8 @@ public class ProgresoManager {
     public void marcarCapturado(String personajeId) {
         if (personajeId == null || personajeId.trim().isEmpty()) return;
 
-        // Evita otorgar doble puntuación si ya fue registrado previamente
         if (estaCapturado(personajeId)) return;
 
-        // 1. Desbloquea el cromo del personaje (ej: "desbloqueado_rojo" = true)
-        // 2. Suma los 50 puntos correspondientes
         prefs.edit()
                 .putBoolean(PREFIX_DESBLOQUEADO + personajeId.toLowerCase().trim(), true)
                 .putInt(KEY_PUNTOS, getPuntos() + 50)
@@ -68,5 +65,20 @@ public class ProgresoManager {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Guarda la clave del traje que Drako debe vestir en la interfaz.
+     */
+    public void setTrajeEquipado(String trajeId) {
+        if (trajeId == null) return;
+        prefs.edit().putString(KEY_TRAJE_EQUIPADO, trajeId.toUpperCase().trim()).apply();
+    }
+
+    /**
+     * Retorna el traje actual equipado ("NORMAL" por defecto).
+     */
+    public String getTrajeEquipado() {
+        return prefs.getString(KEY_TRAJE_EQUIPADO, "NORMAL");
     }
 }

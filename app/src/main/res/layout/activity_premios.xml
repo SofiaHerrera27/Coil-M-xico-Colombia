@@ -1,51 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/pv_fondo">
+    android:orientation="vertical"
+    android:background="#F4F6F8">
 
-    <LinearLayout
+    <!-- Encabezado -->
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="24dp">
+        android:layout_height="60dp"
+        android:background="#1B4D3E"
+        android:paddingHorizontal="16dp">
+
+        <ImageButton
+            android:id="@+id/btnVolverMenu"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_centerVertical="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Volver al menú"
+            android:src="@android:drawable/ic_menu_revert"
+            app:tint="#FFFFFF" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Mis Premios"
-            android:textColor="@color/pv_verde_oscuro"
-            android:textSize="26sp"
+            android:layout_centerInParent="true"
+            android:text="Colección de Dragones"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
             android:textStyle="bold" />
+    </RelativeLayout>
 
-        <TextView
-            android:id="@+id/tvPremiosPuntos"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:textColor="@color/pv_texto"
-            android:textSize="18sp" />
+    <!-- ScrollView que aloja las tarjetas generadas dinámicamente en Java -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
-        <TextView
-            android:id="@+id/tvPremiosAvance"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/pv_texto_suave"
-            android:textSize="15sp" />
-
-        <GridLayout
-            android:id="@+id/gridTrofeos"
+        <LinearLayout
+            android:id="@+id/containerPremios"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:columnCount="2" />
+            android:orientation="vertical"
+            android:padding="12dp" />
+    </ScrollView>
 
-        <Button
-            android:id="@+id/btnVolverPremios"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="16dp"
-            android:text="Volver al menú" />
-    </LinearLayout>
-</ScrollView>
+</LinearLayout>

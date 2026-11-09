@@ -5,6 +5,8 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import androidx.appcompat.app.AlertDialog;
+import com.google.ar.core.ArCoreApk;
 
 public class AnclajeSensor {
 
@@ -35,6 +37,30 @@ public class AnclajeSensor {
     // Verifica si el dispositivo cuenta con sensor giroscópico / vector de rotación
     public boolean disponible() {
         return sensorRotacion != null;
+    }
+
+    /**
+     * Valida tanto la disponibilidad del sensor físico como el soporte de ARCore de Google.
+     */
+    public static boolean esCompatibleConRA(Context context) {
+        AnclajeSensor sensorCheck = new AnclajeSensor(context);
+        if (!sensorCheck.disponible()) {
+            return false;
+        }
+        ArCoreApk.Availability availability = ArCoreApk.getInstance().checkAvailability(context);
+        return availability.isSupported();
+    }
+
+    /**
+     * Despliega la alerta de incompatibilidad.
+     */
+    public static void mostrarAvisoIncompatibilidad(Context context) {
+        new AlertDialog.Builder(context)
+                .setTitle("Función de RA No Disponible")
+                .setMessage("Tu dispositivo no cuenta con giroscopio o los servicios de ARCore requeridos para mostrar modelos 3D en Realidad Aumentada.")
+                .setPositiveButton("Entendido", (dialog, which) -> dialog.dismiss())
+                .setCancelable(true)
+                .show();
     }
 
     // Inicia la lectura de los sensores

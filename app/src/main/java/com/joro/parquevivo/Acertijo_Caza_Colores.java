@@ -45,8 +45,9 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
     private TextView tvTrofeoNombre, tvTrofeoPuntos;
     private ObjectAnimator giroTrofeo, flotarTrofeo;
     private static final long DURACION_GIRO_MS = 5000;
+    private long usuarioId = -1;
 
-    // Control de ejecucion y tiempos
+    // Control de ejecución y tiempos
     private final Handler handlerJuego = new Handler(Looper.getMainLooper());
     private boolean monedaDisponible = false;
     private View imgMoneda;
@@ -75,7 +76,7 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
     private ColorHuntController colorHuntController;
     private Button btnDrakoAccion;
 
-    // Control de progresion de acertijos
+    // Control de progresión de acertijos
     private List<AcertijoColorModel> listaAcertijos;
     private int indiceActual = 0;
     private AcertijoColorModel acertijoActual;
@@ -88,6 +89,9 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_acertijo_caza_colores);
+
+        // Obtener usuario_id
+        usuarioId = getIntent().getLongExtra("usuario_id", -1);
 
         // Inicializar gestor de sonido y contexto global
         MusicaManager.init(this);
@@ -112,8 +116,13 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
         tvTrofeoPuntos = findViewById(R.id.tvTrofeoPuntos);
 
         // Navegación directa a la pantalla de Premios al tocar el trofeo
-        imgTrofeo.setOnClickListener(v ->
-                startActivity(new Intent(this, PremiosActivity.class)));
+        if (imgTrofeo != null) {
+            imgTrofeo.setOnClickListener(v -> {
+                Intent intent = new Intent(this, PremiosActivity.class);
+                intent.putExtra("usuario_id", usuarioId);
+                startActivity(intent);
+            });
+        }
 
         View drakoContainer = findViewById(R.id.layout_drako_container);
         ImageView imgDrako = drakoContainer.findViewById(R.id.imgDrako);
@@ -132,7 +141,9 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
         anclajeSensor = new AnclajeSensor(this);
 
         // Listener de toque para atrapar al personaje
-        imgMariposa.setOnClickListener(v -> alAtraparMariposa());
+        if (imgMariposa != null) {
+            imgMariposa.setOnClickListener(v -> alAtraparMariposa());
+        }
 
         // 3. Cargar acertijos e iniciar
         cargarAcertijos();
@@ -162,8 +173,8 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
                 imgMoneda.setVisibility(View.VISIBLE);
             }
             MusicaManager.reproducirEfecto(R.raw.sfx_aparece);
-            if (tvEstadoEscaneo != null) {
-                tvEstadoEscaneo.append("\n¡Apareció una Moneda Sorpresa!");
+            if (drakoHelper != null) {
+                drakoHelper.mostrarTextoEspecial("¡Mira! Apareció una Moneda Sorpresa. ¡Tócala!");
             }
         }
     }
@@ -180,8 +191,8 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
         MusicaManager.reproducirEfecto(R.raw.sfx_moneda);
         progreso.sumarPuntos(10);
 
-        if (tvEstadoEscaneo != null) {
-            tvEstadoEscaneo.append("\n¡Moneda atrapada! +10 ParquePuntos (total: " + progreso.getPuntos() + ")");
+        if (drakoHelper != null) {
+            drakoHelper.mostrarTextoEspecial("¡Moneda atrapada! +10 ParquePuntos (Total: " + progreso.getPuntos() + ")");
         }
     }
 
@@ -363,8 +374,10 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
         handlerJuego.removeCallbacksAndMessages(null);
         ocultarTrofeo();
 
-        imgMariposa.setVisibility(View.GONE);
-        imgMariposa.animate().cancel();
+        if (imgMariposa != null) {
+            imgMariposa.setVisibility(View.GONE);
+            imgMariposa.animate().cancel();
+        }
         enPersecucion = false;
         anclado = false;
 
@@ -407,9 +420,9 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
                                                 progressBarColor.setProgress(progress);
                                             }
 
-                                            if (progress > 0 && !enPersecucion) {
+                                            if (progress > 0 && !enPersecucion && tvEstadoEscaneo != null) {
                                                 tvEstadoEscaneo.setText("¡Detectando color! Mantén fijo (" + progress + "%)");
-                                            } else if (!enPersecucion) {
+                                            } else if (!enPersecucion && tvEstadoEscaneo != null) {
                                                 tvEstadoEscaneo.setText("Caza de colores iniciada, buscando...");
                                             }
                                         });
@@ -447,6 +460,7 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
     }
 
     private void iniciarJuegoPersecucion() {
+        if (imgMariposa == null) return;
         enPersecucion = true;
         MusicaManager.reproducirEfecto(R.raw.sfx_aparece);
 
@@ -462,8 +476,8 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
         if (raiz == null) raiz = previewView;
 
         float[] c = colorHuntController.getCentroColor();
-        float cx = (c != null) ? c[0] * raiz.getWidth() : raiz.getWidth() / 2f;
-        float cy = (c != null) ? c[1] * raiz.getHeight() : raiz.getHeight() / 2f;
+        float cx = (c != null && raiz != null) ? c[0] * raiz.getWidth() : (raiz != null ? raiz.getWidth() / 2f : 500f);
+        float cy = (c != null && raiz != null) ? c[1] * raiz.getHeight() : (raiz != null ? raiz.getHeight() / 2f : 500f);
 
         imgMariposa.setScaleX(0.2f);
         imgMariposa.setScaleY(0.2f);
@@ -485,8 +499,10 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
     private void drakoHuye() {
         if (!enPersecucion) return;
         enPersecucion = false;
-        imgMariposa.animate().cancel();
-        imgMariposa.setVisibility(View.GONE);
+        if (imgMariposa != null) {
+            imgMariposa.animate().cancel();
+            imgMariposa.setVisibility(View.GONE);
+        }
 
         if (tvEstadoEscaneo != null && acertijoActual != null) {
             tvEstadoEscaneo.setText("¡Se escapó! Busca otro objeto "
@@ -502,7 +518,7 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
     }
 
     private void animarMariposa() {
-        if (!enPersecucion) return;
+        if (!enPersecucion || imgMariposa == null) return;
 
         View parentView = (View) imgMariposa.getParent();
         if (parentView == null) return;
@@ -544,10 +560,11 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
     }
 
     private void anclarPersonaje() {
-        if (!tieneOrientacion) return;
+        if (!tieneOrientacion || imgMariposa == null) return;
 
         View raiz = findViewById(R.id.rootLayout);
         if (raiz == null) raiz = previewView;
+        if (raiz == null) return;
 
         float f = focalPx();
         float w = (raiz.getWidth() > 0) ? raiz.getWidth() : getResources().getDisplayMetrics().widthPixels;
@@ -571,6 +588,7 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
     }
 
     private void proyectarPersonaje() {
+        if (imgMariposa == null) return;
         float[] r = rActual;
         float dx = r[0] * dirMundo[0] + r[3] * dirMundo[1] + r[6] * dirMundo[2];
         float dy = r[1] * dirMundo[0] + r[4] * dirMundo[1] + r[7] * dirMundo[2];
@@ -583,6 +601,7 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
 
         View raiz = findViewById(R.id.rootLayout);
         if (raiz == null) raiz = previewView;
+        if (raiz == null) return;
 
         float w = (raiz.getWidth() > 0) ? raiz.getWidth() : getResources().getDisplayMetrics().widthPixels;
         float h = (raiz.getHeight() > 0) ? raiz.getHeight() : getResources().getDisplayMetrics().heightPixels;
@@ -597,7 +616,7 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
     }
 
     private void alAtraparMariposa() {
-        if (!enPersecucion) return;
+        if (!enPersecucion || imgMariposa == null) return;
         enPersecucion = false;
 
         handlerJuego.removeCallbacks(tareaHuida);
@@ -612,6 +631,9 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
                     String color = acertijoActual.getColorNombre();
                     boolean esNuevo = !progreso.estaCapturado(color);
                     progreso.marcarCapturado(color);
+                    if (esNuevo) {
+                        progreso.sumarPuntos(50);
+                    }
 
                     mostrarTrofeo(esNuevo);
                     completarAcertijo();
@@ -631,22 +653,33 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
 
     private void mostrarTrofeo(boolean esNuevo) {
         MusicaManager.reproducirEfecto(R.raw.sfx_victoria);
-        String color = acertijoActual.getColorNombre();
-        imgTrofeo.setImageResource(acertijoActual.getImagenPersonajeResId());
-        Personaje p = Personaje.desdeColor(color);
-        tvTrofeoNombre.setText(p != null ? p.nombre : "Drako");
-        tvTrofeoPuntos.setText(esNuevo ? "+50 ParquePuntos" : "Ya estaba en tus premios");
-        layoutTrofeo.setVisibility(View.VISIBLE);
+        if (acertijoActual != null && imgTrofeo != null) {
+            String color = acertijoActual.getColorNombre();
+            imgTrofeo.setImageResource(acertijoActual.getImagenPersonajeResId());
+            Personaje p = Personaje.desdeColor(color);
+            if (tvTrofeoNombre != null) {
+                tvTrofeoNombre.setText(p != null ? p.nombre : "Drako");
+            }
+            if (tvTrofeoPuntos != null) {
+                tvTrofeoPuntos.setText(esNuevo ? "+50 ParquePuntos" : "Ya estaba en tus premios");
+            }
+        }
+        if (layoutTrofeo != null) {
+            layoutTrofeo.setVisibility(View.VISIBLE);
+        }
 
-        imgTrofeo.setScaleX(0f);
-        imgTrofeo.setScaleY(0f);
-        imgTrofeo.animate().scaleX(1f).scaleY(1f).setDuration(500)
-                .setInterpolator(new OvershootInterpolator()).start();
+        if (imgTrofeo != null) {
+            imgTrofeo.setScaleX(0f);
+            imgTrofeo.setScaleY(0f);
+            imgTrofeo.animate().scaleX(1f).scaleY(1f).setDuration(500)
+                    .setInterpolator(new OvershootInterpolator()).start();
+        }
 
         iniciarAnimacionesTrofeo();
     }
 
     private void iniciarAnimacionesTrofeo() {
+        if (imgTrofeo == null) return;
         float d = getResources().getDisplayMetrics().density;
         imgTrofeo.setCameraDistance(8000f * d);
         detenerAnimacionesTrofeo();
@@ -671,10 +704,14 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
 
     private void ocultarTrofeo() {
         detenerAnimacionesTrofeo();
-        imgTrofeo.animate().cancel();
-        imgTrofeo.setRotationY(0f);
-        imgTrofeo.setTranslationY(0f);
-        layoutTrofeo.setVisibility(View.GONE);
+        if (imgTrofeo != null) {
+            imgTrofeo.animate().cancel();
+            imgTrofeo.setRotationY(0f);
+            imgTrofeo.setTranslationY(0f);
+        }
+        if (layoutTrofeo != null) {
+            layoutTrofeo.setVisibility(View.GONE);
+        }
     }
 
     private void actualizarInterfazDrako(String textoMensaje, String textoBoton, View.OnClickListener onClickListener) {
@@ -702,7 +739,9 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
                 ProcessCameraProvider cameraProvider = cameraProviderFuture.get();
 
                 Preview preview = new Preview.Builder().build();
-                preview.setSurfaceProvider(previewView.getSurfaceProvider());
+                if (previewView != null) {
+                    preview.setSurfaceProvider(previewView.getSurfaceProvider());
+                }
 
                 ImageAnalysis imageAnalysis = new ImageAnalysis.Builder()
                         .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
@@ -712,10 +751,9 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
                     if (colorHuntController.isScanningActive() && !procesandoFrame) {
                         procesandoFrame = true;
                         ContextCompat.getMainExecutor(this).execute(() -> {
-                            if (colorHuntController.isScanningActive()) {
+                            if (colorHuntController.isScanningActive() && previewView != null) {
                                 Bitmap bitmapCompleto = previewView.getBitmap();
                                 if (bitmapCompleto != null) {
-                                    // Extraer únicamente el 35% central de la pantalla
                                     int width = bitmapCompleto.getWidth();
                                     int height = bitmapCompleto.getHeight();
                                     int cropWidth = (int) (width * 0.35f);
@@ -749,23 +787,21 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        MusicaManager.reanudar(this, MusicaManager.Pista.ACERTIJO);
+        MusicaManager.reanudar(this, MusicaManager.Pista.AMBIENTE);
         if (drakoHelper != null) {
-            drakoHelper.iniciarSinSaludo();
+            drakoHelper.iniciar();
         }
-
-        if (anclajeSensor != null && anclajeSensor.disponible()) {
+        if (anclajeSensor != null) {
+            // Se usa .iniciar() en lugar de .start()
             anclajeSensor.iniciar(r -> {
                 System.arraycopy(r, 0, rActual, 0, 9);
                 tieneOrientacion = true;
-                if (anclado) {
-                    runOnUiThread(this::proyectarPersonaje);
+                if (enPersecucion && !anclado) {
+                    anclarPersonaje();
+                } else if (enPersecucion && anclado) {
+                    proyectarPersonaje();
                 }
             });
-        }
-
-        if (layoutTrofeo != null && layoutTrofeo.getVisibility() == View.VISIBLE) {
-            iniciarAnimacionesTrofeo();
         }
     }
 
@@ -776,10 +812,8 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
         if (drakoHelper != null) {
             drakoHelper.detener();
         }
-        detenerAnimacionesTrofeo();
-        handlerJuego.removeCallbacksAndMessages(null);
-
         if (anclajeSensor != null) {
+            // Se usa .detener() en lugar de .stop()
             anclajeSensor.detener();
         }
     }
@@ -790,5 +824,6 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
         if (drakoHelper != null) {
             drakoHelper.liberar();
         }
+        handlerJuego.removeCallbacksAndMessages(null);
     }
 }

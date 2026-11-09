@@ -14,31 +14,207 @@ import java.security.SecureRandom;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DB_NAME = "parquevivo.db";
-    private static final int DB_VERSION = 1;
-    private static final String TABLE = "usuarios";
+    private static final int DB_VERSION = 5; // Versión 5 para integrar los módulos de ambos
+
+    // Tabla Usuarios
+    private static final String TABLE_USUARIOS = "usuarios";
+
+    // Tabla Premios (Visor RA y Modelos GLB)
+    public static final String TABLE_PREMIOS = "premios";
+    public static final String COL_PREMIO_ID = "id";
+    public static final String COL_PREMIO_NOMBRE = "nombre";
+    public static final String COL_PREMIO_DESCRIPCION = "descripcion";
+    public static final String COL_PREMIO_MODELO_GLB = "modelo_glb";
+    public static final String COL_PREMIO_COSTO = "costo"; // <-- CONSTANTE AGREGADA
+    public static final String COL_PREMIO_DESBLOQUEADO = "desbloqueado";
+
+    // Tabla Álbum de Aventuras (Visor RA)
+    public static final String TABLE_ALBUM = "album_aventuras";
+    public static final String COL_ALBUM_ID = "id";
+    public static final String COL_ALBUM_RUTA = "ruta_foto";
+    public static final String COL_ALBUM_TITULO = "titulo";
+    public static final String COL_ALBUM_DESCRIPCION = "descripcion";
+    public static final String COL_ALBUM_ORIGEN = "origen";
+    public static final String COL_ALBUM_FECHA = "fecha";
+
+    // Tabla Fotos (Módulo de la compañera)
+    public static final String TABLE_FOTOS = "fotos";
 
     public DatabaseHelper(Context context) {
-        // Uso de getApplicationContext() para prevenir fugas de memoria del contexto
         super(context != null ? context.getApplicationContext() : null, DB_NAME, null, DB_VERSION);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE " + TABLE + " ("
+        // 1. Tabla Usuarios
+        String CREATE_TABLE_USUARIOS = "CREATE TABLE " + TABLE_USUARIOS + " ("
                 + "id INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + "nombre TEXT NOT NULL, "
                 + "email TEXT NOT NULL UNIQUE, "
                 + "salt TEXT NOT NULL, "
-                + "password_hash TEXT NOT NULL)");
+                + "password_hash TEXT NOT NULL, "
+                + "puntos INTEGER DEFAULT 0)";
+        db.execSQL(CREATE_TABLE_USUARIOS);
+
+        // 2. Tabla Premios (RA)
+        crearTablaPremios(db);
+
+        // 3. Tabla Álbum de Aventuras
+        crearTablaAlbum(db);
+
+        // 4. Tabla Fotos (Módulo compañera)
+        crearTablaFotos(db);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE);
-        onCreate(db);
+        if (oldVersion < 2) {
+            crearTablaPremios(db);
+        }
+        if (oldVersion < 3) {
+            crearTablaAlbum(db);
+        }
+        if (oldVersion < 4) {
+            crearTablaFotos(db);
+        }
+        if (oldVersion < 5) {
+            db.execSQL("ALTER TABLE " + TABLE_USUARIOS + " ADD COLUMN puntos INTEGER DEFAULT 0;");
+            db.execSQL("ALTER TABLE " + TABLE_PREMIOS + " ADD COLUMN " + COL_PREMIO_COSTO + " INTEGER DEFAULT 100;");
+        }
     }
 
-    /** Devuelve true si el usuario se creó; false si el correo ya existe o los datos son inválidos. */
+    private void crearTablaPremios(SQLiteDatabase db) {
+        String CREATE_TABLE_PREMIOS = "CREATE TABLE IF NOT EXISTS " + TABLE_PREMIOS + " (" +
+                COL_PREMIO_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COL_PREMIO_NOMBRE + " TEXT NOT NULL, " +
+                COL_PREMIO_DESCRIPCION + " TEXT, " +
+                COL_PREMIO_MODELO_GLB + " TEXT NOT NULL, " +
+                COL_PREMIO_COSTO + " INTEGER DEFAULT 100, " +
+                COL_PREMIO_DESBLOQUEADO + " INTEGER DEFAULT 0)";
+        db.execSQL(CREATE_TABLE_PREMIOS);
+
+        poblarPremiosIniciales(db);
+    }
+
+    private void crearTablaAlbum(SQLiteDatabase db) {
+        String CREATE_TABLE_ALBUM = "CREATE TABLE IF NOT EXISTS " + TABLE_ALBUM + " (" +
+                COL_ALBUM_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COL_ALBUM_RUTA + " TEXT NOT NULL, " +
+                COL_ALBUM_TITULO + " TEXT NOT NULL, " +
+                COL_ALBUM_DESCRIPCION + " TEXT, " +
+                COL_ALBUM_ORIGEN + " TEXT, " +
+                COL_ALBUM_FECHA + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP)";
+        db.execSQL(CREATE_TABLE_ALBUM);
+    }
+
+    private void crearTablaFotos(SQLiteDatabase db) {
+        String CREATE_TABLE_FOTOS = "CREATE TABLE IF NOT EXISTS " + TABLE_FOTOS + " (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "usuario_id INTEGER NOT NULL, " +
+                "nombre_archivo TEXT NOT NULL, " +
+                "ruta TEXT NOT NULL, " +
+                "fecha TEXT NOT NULL, " +
+                "FOREIGN KEY(usuario_id) REFERENCES " + TABLE_USUARIOS + "(id))";
+        db.execSQL(CREATE_TABLE_FOTOS);
+    }
+
+    /** Carga inicial de los personajes 3D del proyecto */
+    private void poblarPremiosIniciales(SQLiteDatabase db) {
+        Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + TABLE_PREMIOS, null);
+        if (cursor != null) {
+            cursor.moveToFirst();
+            int count = cursor.getInt(0);
+            cursor.close();
+            if (count > 0) return;
+        }
+
+        insertarPremioInicial(db, "Drako Morado", "El místico guardián principal de ParqueVivo.", "models/morado.glb", 0, 1);
+        insertarPremioInicial(db, "Guardián Rojo", "Furia de fuego y energía del bosque.", "models/rojo.glb", 100, 0);
+        insertarPremioInicial(db, "Guardián Verde", "Protector de los árboles y hojas secas.", "models/verde.glb", 150, 0);
+        insertarPremioInicial(db, "Guardián Azul", "Espíritu cristalino de los lagos y arroyos.", "models/azul.glb", 200, 0);
+    }
+
+    private void insertarPremioInicial(SQLiteDatabase db, String nombre, String desc, String modeloGlb, int costo, int desbloqueado) {
+        ContentValues values = new ContentValues();
+        values.put(COL_PREMIO_NOMBRE, nombre);
+        values.put(COL_PREMIO_DESCRIPCION, desc);
+        values.put(COL_PREMIO_MODELO_GLB, modeloGlb);
+        values.put(COL_PREMIO_COSTO, costo);
+        values.put(COL_PREMIO_DESBLOQUEADO, desbloqueado);
+        db.insert(TABLE_PREMIOS, null, values);
+    }
+
+    // MÉTODOS DE FOTOS Y ÁLBUM (INTEGRADOS)
+    public boolean insertarFotoAlbum(String rutaFoto, String titulo, String descripcion, String origen) {
+        ContentValues values = new ContentValues();
+        values.put(COL_ALBUM_RUTA, rutaFoto);
+        values.put(COL_ALBUM_TITULO, titulo);
+        values.put(COL_ALBUM_DESCRIPCION, descripcion);
+        values.put(COL_ALBUM_ORIGEN, origen);
+
+        long id = getWritableDatabase().insert(TABLE_ALBUM, null, values);
+        return id != -1;
+    }
+
+    public Cursor obtenerFotosAlbum() {
+        return getReadableDatabase().query(TABLE_ALBUM, null, null, null, null, null, COL_ALBUM_FECHA + " DESC");
+    }
+
+    public boolean registrarFoto(long usuarioId, String nombreArchivo, String ruta, String fecha) {
+        if (usuarioId <= 0 || nombreArchivo == null || ruta == null || fecha == null) {
+            return false;
+        }
+
+        ContentValues values = new ContentValues();
+        values.put("usuario_id", usuarioId);
+        values.put("nombre_archivo", nombreArchivo);
+        values.put("ruta", ruta);
+        values.put("fecha", fecha);
+
+        long resultado = getWritableDatabase().insert(TABLE_FOTOS, null, values);
+        return resultado != -1;
+    }
+
+    public Cursor obtenerFotosUsuario(long usuarioId) {
+        return getReadableDatabase().query(
+                TABLE_FOTOS,
+                new String[]{"id", "nombre_archivo", "ruta", "fecha"},
+                "usuario_id = ?",
+                new String[]{String.valueOf(usuarioId)},
+                null, null,
+                "id DESC"
+        );
+    }
+
+    public boolean eliminarFoto(long fotoId, long usuarioId) {
+        int resultado = getWritableDatabase().delete(
+                TABLE_FOTOS,
+                "id = ? AND usuario_id = ?",
+                new String[]{String.valueOf(fotoId), String.valueOf(usuarioId)}
+        );
+        return resultado > 0;
+    }
+
+    public long obtenerIdFoto(long usuarioId, String ruta) {
+        Cursor c = getReadableDatabase().query(
+                TABLE_FOTOS,
+                new String[]{"id"},
+                "usuario_id = ? AND ruta = ?",
+                new String[]{String.valueOf(usuarioId), ruta},
+                null, null, null
+        );
+
+        try {
+            if (c != null && c.moveToFirst()) {
+                return c.getLong(0);
+            }
+            return -1;
+        } finally {
+            if (c != null) c.close();
+        }
+    }
+
+    // MÉTODOS DE AUTENTICACIÓN Y USUARIOS
     public boolean registrarUsuario(String nombre, String email, String password) {
         if (nombre == null || email == null || password == null) return false;
 
@@ -52,16 +228,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put("salt", salt);
         values.put("password_hash", hash(password, salt));
 
-        long id = getWritableDatabase().insert(TABLE, null, values);
+        long id = getWritableDatabase().insert(TABLE_USUARIOS, null, values);
         return id != -1;
     }
 
-    /** Devuelve el nombre del usuario si las credenciales son correctas; null si no. */
     public String validarLogin(String email, String password) {
         if (email == null || password == null) return null;
 
         String emailLimpio = email.trim().toLowerCase();
-        Cursor c = getReadableDatabase().query(TABLE,
+        Cursor c = getReadableDatabase().query(TABLE_USUARIOS,
                 new String[]{"nombre", "salt", "password_hash"},
                 "email = ?", new String[]{emailLimpio},
                 null, null, null);
@@ -77,16 +252,36 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             }
             return null;
         } finally {
-            if (c != null) {
-                c.close();
+            if (c != null) c.close();
+        }
+    }
+
+    public long obtenerIdUsuario(String email) {
+        if (email == null) return -1;
+
+        String emailLimpio = email.trim().toLowerCase();
+        Cursor c = getReadableDatabase().query(
+                TABLE_USUARIOS,
+                new String[]{"id"},
+                "email = ?",
+                new String[]{emailLimpio},
+                null, null, null
+        );
+
+        try {
+            if (c != null && c.moveToFirst()) {
+                return c.getLong(0);
             }
+            return -1;
+        } finally {
+            if (c != null) c.close();
         }
     }
 
     private boolean existeEmail(String email) {
         if (email == null) return false;
 
-        Cursor c = getReadableDatabase().query(TABLE, new String[]{"id"},
+        Cursor c = getReadableDatabase().query(TABLE_USUARIOS, new String[]{"id"},
                 "email = ?", new String[]{email.trim().toLowerCase()}, null, null, null);
         boolean existe = false;
         if (c != null) {
@@ -96,6 +291,54 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return existe;
     }
 
+    // MÉTODOS DE GESTIÓN DE PREMIOS (RA)
+    public boolean registrarPremio(String nombre, String descripcion, String modeloGlb, boolean desbloqueado) {
+        ContentValues values = new ContentValues();
+        values.put(COL_PREMIO_NOMBRE, nombre);
+        values.put(COL_PREMIO_DESCRIPCION, descripcion);
+        values.put(COL_PREMIO_MODELO_GLB, modeloGlb);
+        values.put(COL_PREMIO_DESBLOQUEADO, desbloqueado ? 1 : 0);
+
+        long id = getWritableDatabase().insert(TABLE_PREMIOS, null, values);
+        return id != -1;
+    }
+
+    public boolean desbloquearPremio(int premioId) {
+        ContentValues values = new ContentValues();
+        values.put(COL_PREMIO_DESBLOQUEADO, 1);
+        int filasAfectadas = getWritableDatabase().update(TABLE_PREMIOS, values, COL_PREMIO_ID + "=?", new String[]{String.valueOf(premioId)});
+        return filasAfectadas > 0;
+    }
+
+    public String getRutaModeloGlb(int premioId) {
+        SQLiteDatabase db = getReadableDatabase();
+        String ruta = "";
+        Cursor cursor = db.query(TABLE_PREMIOS,
+                new String[]{COL_PREMIO_MODELO_GLB},
+                COL_PREMIO_ID + "=?",
+                new String[]{String.valueOf(premioId)},
+                null, null, null);
+
+        if (cursor != null) {
+            try {
+                if (cursor.moveToFirst()) {
+                    int index = cursor.getColumnIndex(COL_PREMIO_MODELO_GLB);
+                    if (index != -1) {
+                        ruta = cursor.getString(index);
+                    }
+                }
+            } finally {
+                cursor.close();
+            }
+        }
+        return ruta;
+    }
+
+    public Cursor obtenerTodosLosPremios() {
+        return getReadableDatabase().query(TABLE_PREMIOS, null, null, null, null, null, COL_PREMIO_ID + " ASC");
+    }
+
+    // SEGURIDAD Y HASH
     private String generarSalt() {
         byte[] bytes = new byte[16];
         new SecureRandom().nextBytes(bytes);

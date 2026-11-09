@@ -4,7 +4,6 @@ import android.graphics.Bitmap;
 
 public class ColorHuntController {
 
-    // Interfaz Callback: Permite notificar a la Activity el progreso del escaneo y la confirmación
     public interface ColorDetectionListener {
         void onProgressUpdate(int progress);
         void onColorVerified();
@@ -58,7 +57,7 @@ public class ColorHuntController {
         if (detected) {
             currentProgress = Math.min(MAX_PROGRESS, currentProgress + INCREMENT);
         } else {
-            // CORREGIDO: Se añadió el operador de resta (-)
+            // Operador de resta corregido
             currentProgress = Math.max(0, currentProgress - DECREMENT);
         }
 

@@ -8,7 +8,7 @@ public class MusicaManager {
 
     private static final String TAG = "MUSICA";
     private static final float VOL_NORMAL = 0.8f;
-    private static final float VOL_BAJO = 0.2f;
+    private static final float VOL_BAJO = 0.25f;
 
     public enum Pista {
         AMBIENTE(R.raw.musica_ambiente),
@@ -21,7 +21,7 @@ public class MusicaManager {
     private static Context appContext;
     private static MediaPlayer player;
     private static boolean debeSonar = false;
-    private static boolean musicaHabilitada = true; // Control global del usuario
+    private static boolean musicaHabilitada = true;
     private static Pista pistaActual = Pista.AMBIENTE;
     private static int bajadas = 0;
 
@@ -31,7 +31,6 @@ public class MusicaManager {
         }
     }
 
-    // --- NUEVO: Control de interruptor de música ---
     public static boolean isMusicaHabilitada() {
         return musicaHabilitada;
     }
@@ -51,13 +50,14 @@ public class MusicaManager {
 
     public static void reanudar(Context context, Pista pista) {
         init(context);
-        if (!musicaHabilitada) return; // Si el usuario la apagó, se respeta la decisión
+        if (!musicaHabilitada) return;
 
         if (pista != pistaActual || player == null) {
             pistaActual = pista;
             liberar();
         }
         debeSonar = true;
+        bajadas = 0;
         actualizar();
     }
 
@@ -113,17 +113,23 @@ public class MusicaManager {
         }
     }
 
-    public static void bajarVolumen() { bajadas++; aplicarVolumen(); }
+    public static void bajarVolumen() {
+        bajadas++;
+        aplicarVolumen();
+    }
 
     public static void subirVolumen() {
         if (bajadas > 0) bajadas--;
+        else bajadas = 0;
         aplicarVolumen();
     }
 
     private static void aplicarVolumen() {
         if (player != null) {
-            float v = (bajadas > 0) ? VOL_BAJO : VOL_NORMAL;
-            player.setVolume(v, v);
+            try {
+                float v = (bajadas > 0) ? VOL_BAJO : VOL_NORMAL;
+                player.setVolume(v, v);
+            } catch (Exception ignored) { }
         }
     }
 
@@ -132,11 +138,16 @@ public class MusicaManager {
         try {
             if (player == null) {
                 player = MediaPlayer.create(appContext, pistaActual.rawId);
-                if (player == null) { Log.e(TAG, "no se pudo crear " + pistaActual); return; }
+                if (player == null) {
+                    Log.e(TAG, "no se pudo crear " + pistaActual);
+                    return;
+                }
                 player.setLooping(true);
-                aplicarVolumen();
             }
-            if (!player.isPlaying()) player.start();
+            aplicarVolumen();
+            if (!player.isPlaying()) {
+                player.start();
+            }
             Log.d(TAG, "sonando " + pistaActual);
         } catch (Exception e) {
             Log.e(TAG, "error al reproducir", e);

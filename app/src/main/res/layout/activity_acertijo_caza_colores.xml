@@ -4,49 +4,53 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/rootLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#000000">
 
-    <!-- Vista en vivo de CameraX con modo compatible para la captura de pantalla -->
+    <!-- Vista en vivo de CameraX -->
     <androidx.camera.view.PreviewView
         android:id="@+id/previewView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:implementationMode="compatible" />
 
-    <!-- Mira/Retículo en el centro para indicar dónde enfocar -->
+    <!-- Mira/Retículo en el centro translúcida -->
     <View
         android:id="@+id/viewTargetCenter"
         android:layout_width="140dp"
         android:layout_height="140dp"
-        android:background="@drawable/bg_input"
-        android:alpha="0.6"
+        android:background="@drawable/bg_dialog_redondeado"
+        android:backgroundTint="#33FFFFFF"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Texto del Acertijo -->
+    <!-- Texto del Acertijo (Semitransparente con esquinas redondeadas) -->
     <TextView
         android:id="@+id/tvAcertijo"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="12dp"
-        android:background="#1B4332"
+        android:layout_margin="14dp"
+        android:background="@drawable/bg_dialog_redondeado"
+        android:backgroundTint="#B31B4332"
         android:padding="14dp"
         android:textColor="#FFFFFF"
-        android:textSize="15sp"
+        android:textSize="14sp"
+        android:textStyle="bold"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Panel de Estado e Indicador de Búsqueda -->
+    <!-- Panel de Estado flotante y separado -->
     <LinearLayout
         android:id="@+id/layoutEstadoBusqueda"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="24dp"
+        android:layout_marginHorizontal="20dp"
         android:layout_marginTop="8dp"
-        android:background="#1B4332"
+        android:background="@drawable/bg_dialog_redondeado"
+        android:backgroundTint="#80000000"
         android:orientation="vertical"
         android:padding="10dp"
         android:gravity="center"
@@ -58,23 +62,23 @@
             android:id="@+id/tvEstadoEscaneo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Presiona '¡Buscar Color!' cuando estés listo para iniciar la caza de colores"
-            android:textColor="#FFFFFF"
-            android:textSize="14sp"
-            android:textStyle="bold" />
+            android:gravity="center"
+            android:text="Presiona '¡Buscar Color!' para iniciar"
+            android:textColor="#E0E0E0"
+            android:textSize="13sp" />
 
         <ProgressBar
             android:id="@+id/progressBarColor"
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
-            android:layout_height="16dp"
+            android:layout_height="12dp"
             android:layout_marginTop="6dp"
             android:max="100"
             android:progress="0"
             android:visibility="gone" />
     </LinearLayout>
 
-    <!-- Objeto animado (Drako/Mariposa) a perseguir y atrapar -->
+    <!-- Objeto animado (Drako/Mariposa) -->
     <ImageView
         android:id="@+id/imgMariposaPersecucion"
         android:layout_width="90dp"
@@ -85,7 +89,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <!-- Moneda Sorpresa flutuante sobre la mira central -->
+    <!-- Moneda Sorpresa flotante -->
     <ImageView
         android:id="@+id/imgMoneda"
         android:layout_width="60dp"
@@ -99,6 +103,7 @@
         app:layout_constraintTop_toTopOf="@id/viewTargetCenter"
         android:contentDescription="Moneda Sorpresa" />
 
+    <!-- Panel de Trofeo -->
     <LinearLayout
         android:id="@+id/layoutTrofeo"
         android:layout_width="0dp"
@@ -117,7 +122,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text=" ¡TROFEO DESBLOQUEADO!"
+            android:text="¡TROFEO DESBLOQUEADO!"
             android:textColor="#FFD54F"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -154,7 +159,7 @@
             android:textSize="13sp" />
     </LinearLayout>
 
-    <!-- Drako flotante sobrepuesto en la parte inferior -->
+    <!-- Drako flotante -->
     <include
         android:id="@+id/layout_drako_container"
         layout="@layout/layout_drako_flotante"

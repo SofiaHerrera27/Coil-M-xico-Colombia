@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="16dp"
+    app:cardCornerRadius="24dp"
+    app:cardElevation="10dp"
+    app:cardBackgroundColor="#FFFFFF">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <!-- Imagen Grande del Personaje Ganado -->
+        <ImageView
+            android:id="@+id/imgPremioGrande"
+            android:layout_width="160dp"
+            android:layout_height="160dp"
+            android:contentDescription="Premio 3D"
+            android:scaleType="fitCenter"
+            android:src="@android:drawable/ic_menu_gallery" />
+
+        <!-- Nombre del Personaje + Botón de Voz -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvNombrePremio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Nombre del Dragón"
+                android:textColor="#1B4D3E"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <ImageButton
+                android:id="@+id/btnEscucharVoz"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginStart="8dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Escuchar Voz"
+                android:src="@android:drawable/ic_btn_speak_now"
+                app:tint="#1B4D3E" />
+        </LinearLayout>
+
+        <!-- Etiqueta de Gustos / Elemento -->
+        <TextView
+            android:id="@+id/tvGustosPremio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Gustos del guardián"
+            android:textColor="#555555"
+            android:textSize="13sp"
+            android:textStyle="italic" />
+
+        <!-- Historia / Descripción breve -->
+        <TextView
+            android:id="@+id/tvHistoriaPremio"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:gravity="center"
+            android:text="Historia del guardián"
+            android:textColor="#333333"
+            android:textSize="14sp" />
+
+        <!-- Botón Principal: Ver en Realidad Aumentada / 3D -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnVerEnRA"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Ver en 3D / RA"
+            app:backgroundTint="#1B4D3E"
+            app:cornerRadius="20dp" />
+
+        <!-- Botón Secundario: Cerrar cuadro flotante -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCerrarDialog"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="¡Genial!"
+            android:textColor="#1B4D3E"
+            app:cornerRadius="20dp"
+            app:strokeColor="#1B4D3E" />
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>
