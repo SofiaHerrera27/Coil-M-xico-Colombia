@@ -5,6 +5,8 @@ import android.animation.ValueAnimator;
 import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -185,7 +187,7 @@ public class PremiosActivity extends AppCompatActivity {
         card.setLayoutParams(cardParams);
         card.setRadius(18 * density);
         card.setCardElevation(4 * density);
-        card.setCardBackgroundColor(p.desbloqueado ? Color.parseColor("#FFFFFF") : Color.parseColor("#F0F0F0"));
+        card.setCardBackgroundColor(p.desbloqueado ? Color.parseColor("#FFFFFF") : Color.parseColor("#F4F4F4"));
 
         LinearLayout box = new LinearLayout(this);
         box.setOrientation(LinearLayout.VERTICAL);
@@ -199,10 +201,22 @@ public class PremiosActivity extends AppCompatActivity {
         img.setLayoutParams(imgParams);
         img.setImageResource(p.imgRes);
 
-        img.setAlpha(p.desbloqueado ? 1.0f : 0.28f);
+        // -----------------------------------------------------------------
+        // EFECTO POKÉDEX / BOCETO
+        // -----------------------------------------------------------------
+        if (p.desbloqueado) {
+            img.clearColorFilter(); // Muestra el sprite a todo color
+            img.setAlpha(1.0f);     // 100% visible
+        } else {
+            ColorMatrix matrix = new ColorMatrix();
+            matrix.setSaturation(0); // Convierte a escala de grises / boceto
+            ColorMatrixColorFilter filter = new ColorMatrixColorFilter(matrix);
+            img.setColorFilter(filter);
+            img.setAlpha(0.40f);    // Translucidez suave de croquis/boceto
+        }
 
         TextView tvNombre = new TextView(this);
-        tvNombre.setText(p.desbloqueado ? p.nombre : "🔒 " + p.colorId);
+        tvNombre.setText(p.desbloqueado ? p.nombre : "🔒 Boceto: " + p.colorId);
         tvNombre.setTextSize(14f);
         tvNombre.setTypeface(null, Typeface.BOLD);
         tvNombre.setTextColor(p.desbloqueado ? Color.parseColor("#1B4D3E") : Color.parseColor("#777777"));
@@ -243,9 +257,16 @@ public class PremiosActivity extends AppCompatActivity {
 
         if (imgPremioGrande != null) {
             imgPremioGrande.setImageResource(imagenResId);
-            imgPremioGrande.setAlpha(desbloqueado ? 1.0f : 0.35f);
             if (desbloqueado) {
+                imgPremioGrande.clearColorFilter();
+                imgPremioGrande.setAlpha(1.0f);
                 aplicarAnimacion3DInteractiva(imgPremioGrande);
+            } else {
+                ColorMatrix matrix = new ColorMatrix();
+                matrix.setSaturation(0);
+                ColorMatrixColorFilter filter = new ColorMatrixColorFilter(matrix);
+                imgPremioGrande.setColorFilter(filter);
+                imgPremioGrande.setAlpha(0.40f);
             }
         }
 

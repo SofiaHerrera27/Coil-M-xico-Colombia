@@ -8,6 +8,7 @@ import android.os.Looper;
 import android.os.SystemClock;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -20,6 +21,7 @@ import java.util.Random;
 
 public class DrakoHelper implements TextToSpeech.OnInitListener {
 
+    private static final String TAG = "DrakoHelper";
     private MediaPlayer vozLocal;
     private TextToSpeech tts;
     private boolean ttsListo = false;
@@ -47,7 +49,7 @@ public class DrakoHelper implements TextToSpeech.OnInitListener {
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final Random random = new Random();
 
-    // Sprites de parpadeo (Cambiados a no-finales para actualizar con cada traje)
+    // Sprites de parpadeo
     private Drawable abierto;
     private Drawable medio;
     private Drawable cerrado;
@@ -64,7 +66,6 @@ public class DrakoHelper implements TextToSpeech.OnInitListener {
         this.tvGlobo = tvGlobo;
         this.tipoPantalla = tipoPantalla;
 
-        // Carga la vestimenta inicial de Drako guardada en el progreso
         cargarSpritesSegunTraje();
 
         if (!indicesMensajes.containsKey(tipoPantalla)) {
@@ -75,199 +76,232 @@ public class DrakoHelper implements TextToSpeech.OnInitListener {
             this.imgDrako.setOnClickListener(v -> alHacerClickEnDrako());
         }
 
-        // Inicializar motor de voz TTS
-        tts = new TextToSpeech(context.getApplicationContext(), this);
+        try {
+            if (context != null) {
+                tts = new TextToSpeech(context.getApplicationContext(), this);
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error inicializando TextToSpeech", e);
+        }
     }
 
     /**
-     * Revisa en ProgresoManager cuál traje está equipado y asigna las imágenes correspondientes.
+     * Revisa en ProgresoManager cuál traje está equipado y asigna la imagen correspondiente.
+     * Incluye protección individual contra Resources.NotFoundException.
      */
     public void cargarSpritesSegunTraje() {
-        ProgresoManager progreso = new ProgresoManager(context);
-        String traje = progreso.getTrajeEquipado().toLowerCase().trim();
+        try {
+            ProgresoManager progreso = new ProgresoManager(context);
+            String trajeEquipado = progreso.getTrajeEquipado();
+            String traje = (trajeEquipado != null) ? trajeEquipado.toLowerCase().trim() : "";
 
-        int resAbierto;
-        int resMedio;
-        int resCerrado;
+            int resAbierto;
+            int resMedio;
+            int resCerrado;
 
-        switch (traje) {
-            case "sombrero_explorador":
-                resAbierto = R.drawable.dragon_sombrero;
-                resMedio = R.drawable.dragon_sombrero_medio;
-                resCerrado = R.drawable.dragon_sombrero_cerrados;
-                break;
+            switch (traje) {
+                case "sombrero_explorador":
+                    resAbierto = R.drawable.dragon_sombrero;
+                    resMedio = R.drawable.dragon_sombrero_medio;
+                    resCerrado = R.drawable.dragon_sombrero_cerrados;
+                    break;
 
-            case "gorra_guardabosques":
-                resAbierto = R.drawable.drago_guardab;
-                resMedio = R.drawable.drago_guardab_medio;
-                resCerrado = R.drawable.drago_guardab_cerrados;
-                break;
+                case "gorra_guardabosques":
+                    resAbierto = R.drawable.drago_guardab;
+                    resMedio = R.drawable.drago_guardab_medio;
+                    resCerrado = R.drawable.drago_guardab_cerrados;
+                    break;
 
-            case "mochila_exploradora":
-                resAbierto = R.drawable.drago_mochila;
-                resMedio = R.drawable.drago_mochila_medio;
-                resCerrado = R.drawable.drago_mochila_cerrados;
-                break;
+                case "mochila_exploradora":
+                    resAbierto = R.drawable.drago_mochila;
+                    resMedio = R.drawable.drago_mochila_medio;
+                    resCerrado = R.drawable.drago_mochila_cerrados;
+                    break;
 
-            case "brujula_dorada":
-                resAbierto = R.drawable.drago_brujula;
-                resMedio = R.drawable.drago_brujula_medio;
-                resCerrado = R.drawable.drago_brujula_cerrados;
-                break;
+                case "brujula_dorada":
+                    resAbierto = R.drawable.drago_brujula;
+                    resMedio = R.drawable.drago_brujula_medio;
+                    resCerrado = R.drawable.drago_brujula_cerrados;
+                    break;
 
-            case "mariposa_magica":
-                resAbierto = R.drawable.drago_mariposa;
-                resMedio = R.drawable.drago_mariposa_medio;
-                resCerrado = R.drawable.drago_mariposa_cerrados;
-                break;
+                case "mariposa_magica":
+                    resAbierto = R.drawable.drago_mariposa;
+                    resMedio = R.drawable.drago_mariposa_medio;
+                    resCerrado = R.drawable.drago_mariposa_cerrados;
+                    break;
 
-            case "sombrero_mago":
-                resAbierto = R.drawable.drago_smago;
-                resMedio = R.drawable.drago_smago_medio;
-                resCerrado = R.drawable.drago_smago_cerrados;
-                break;
+                case "sombrero_mago":
+                    resAbierto = R.drawable.drago_smago;
+                    resMedio = R.drawable.drago_smago_medio;
+                    resCerrado = R.drawable.drago_smago_cerrados;
+                    break;
 
-            case "cristal_energia":
-                resAbierto = R.drawable.drago_cristal;
-                resMedio = R.drawable.drago_cristal_medio;
-                resCerrado = R.drawable.drago_cristal_cerrados;
-                break;
+                case "cristal_energia":
+                    resAbierto = R.drawable.drago_cristal;
+                    resMedio = R.drawable.drago_cristal_medio;
+                    resCerrado = R.drawable.drago_cristal_cerrados;
+                    break;
 
-            case "zorrito_bosque":
-                resAbierto = R.drawable.drago_zorro;
-                resMedio = R.drawable.drago_zorro_medio;
-                resCerrado = R.drawable.drago_zorro_cerrados;
-                break;
+                case "zorrito_bosque":
+                    resAbierto = R.drawable.drago_zorro;
+                    resMedio = R.drawable.drago_zorro;
+                    resCerrado = R.drawable.drago_zorro;
+                    break;
 
-            case "buho_sabio":
-                resAbierto = R.drawable.drago_buho;
-                resMedio = R.drawable.drago_buho_medio;
-                resCerrado = R.drawable.drago_buho_cerrados;
-                break;
+                case "buho_sabio":
+                    resAbierto = R.drawable.drago_buho;
+                    resMedio = R.drawable.drago_buho_medio;
+                    resCerrado = R.drawable.drago_buho_cerrados;
+                    break;
 
-            case "medalla_ecologica":
-                resAbierto = R.drawable.drago_medalla;
-                resMedio = R.drawable.drago_medalla_medio;
-                resCerrado = R.drawable.drago_medalla_cerrados;
-                break;
+                case "medalla_ecologica":
+                    resAbierto = R.drawable.drago_medalla;
+                    resMedio = R.drawable.drago_medalla_medio;
+                    resCerrado = R.drawable.drago_medalla_cerrados;
+                    break;
 
-            case "corona_dorada":
-                resAbierto = R.drawable.drago_corona;
-                resMedio = R.drawable.drago_corona_medio;
-                resCerrado = R.drawable.drago_corona_cerrados;
-                break;
+                case "corona_dorada":
+                    resAbierto = R.drawable.drago_corona;
+                    resMedio = R.drawable.drago_corona_medio;
+                    resCerrado = R.drawable.drago_corona_cerrados;
+                    break;
 
-            case "alas_magicas":
-                resAbierto = R.drawable.drago_alas_mariposa;
-                resMedio = R.drawable.drago_alas_mariposa_medio;
-                resCerrado = R.drawable.drago_alas_mariposa_cerrados;
-                break;
+                case "alas_magicas":
+                    resAbierto = R.drawable.drago_alas_mariposa;
+                    resMedio = R.drawable.drago_alas_mariposa_medio;
+                    resCerrado = R.drawable.drago_alas_mariposa_cerrados;
+                    break;
 
-            case "dragon_bebe":
-                resAbierto = R.drawable.drago_bebe;
-                resMedio = R.drawable.drago_bebe_medio;
-                resCerrado = R.drawable.drago_bebe_cerrados;
-                break;
+                case "dragon_bebe":
+                    resAbierto = R.drawable.drago_bebe;
+                    resMedio = R.drawable.drago_bebe_medio;
+                    resCerrado = R.drawable.drago_bebe_cerrados;
+                    break;
 
-            case "tunica_magica":
-                resAbierto = R.drawable.drago_tunica;
-                resMedio = R.drawable.drago_tunica_medio;
-                resCerrado = R.drawable.drago_tunica_cerrados;
-                break;
+                case "tunica_magica":
+                    resAbierto = R.drawable.drago_tunica;
+                    resMedio = R.drawable.drago_tunica_medio;
+                    resCerrado = R.drawable.drago_tunica_cerrados;
+                    break;
 
-            case "guardian_bosque":
-                resAbierto = R.drawable.drago_guardian;
-                resMedio = R.drawable.drago_guardian_medio;
-                resCerrado = R.drawable.drago_guardian_cerrados;
-                break;
+                case "guardian_bosque":
+                    resAbierto = R.drawable.drago_guardian;
+                    resMedio = R.drawable.drago_guardian_medio;
+                    resCerrado = R.drawable.drago_guardian_cerrados;
+                    break;
 
-            case "traje_aventurero":
-                resAbierto = R.drawable.drago_aventurero;
-                resMedio = R.drawable.drago_aventurero_medio;
-                resCerrado = R.drawable.drago_aventurero_cerrados;
-                break;
+                case "traje_aventurero":
+                    resAbierto = R.drawable.drago_aventurero;
+                    resMedio = R.drawable.drago_aventurero_medio;
+                    resCerrado = R.drawable.drago_aventurero_cerrados;
+                    break;
 
-            case "varita_natural":
-                resAbierto = R.drawable.drago_varita;
-                resMedio = R.drawable.drago_varita_medio;
-                resCerrado = R.drawable.drago_varita_cerrados;
-                break;
+                case "varita_natural":
+                    resAbierto = R.drawable.drago_varita;
+                    resMedio = R.drawable.drago_varita_medio;
+                    resCerrado = R.drawable.drago_varita_cerrados;
+                    break;
 
-            case "cofre_misterioso":
-                resAbierto = R.drawable.drago_cofre;
-                resMedio = R.drawable.drago_cofre_medio;
-                resCerrado = R.drawable.drago_cofre_cerrados;
-                break;
+                case "cofre_misterioso":
+                    resAbierto = R.drawable.drago_cofre;
+                    resMedio = R.drawable.drago_cofre_medio;
+                    resCerrado = R.drawable.drago_cofre_cerrados;
+                    break;
 
-            case "armadura_dorada":
-                resAbierto = R.drawable.drago_armadura_caballero;
-                resMedio = R.drawable.drago_armadura_caballero_medio;
-                resCerrado = R.drawable.drago_armadura_caballero_cerrados;
-                break;
+                case "armadura_dorada":
+                    resAbierto = R.drawable.drago_armadura_caballero;
+                    resMedio = R.drawable.drago_armadura_caballero_medio;
+                    resCerrado = R.drawable.drago_armadura_caballero_cerrados;
+                    break;
 
-            case "alas_celestiales":
-                resAbierto = R.drawable.drago_alas_doradas;
-                resMedio = R.drawable.drago_alas_doradas_medio;
-                resCerrado = R.drawable.drago_alas_doradas_cerrados;
-                break;
+                case "alas_celestiales":
+                    resAbierto = R.drawable.drago_alas_doradas;
+                    resMedio = R.drawable.drago_alas_doradas_medio;
+                    resCerrado = R.drawable.drago_alas_doradas_cerrados;
+                    break;
 
-            default:
-                resAbierto = R.drawable.drako;
-                resMedio = R.drawable.drako_medio;
-                resCerrado = R.drawable.drako_cerrado;
-                break;
+                default:
+                    resAbierto = R.drawable.drako;
+                    resMedio = R.drawable.drako_medio;
+                    resCerrado = R.drawable.drako_cerrado;
+                    break;
+            }
+
+            // Intento de carga individual con fallback a la imagen por defecto si el ID no existe en drawable
+            try {
+                abierto = ContextCompat.getDrawable(context, resAbierto);
+            } catch (Exception e) {
+                abierto = ContextCompat.getDrawable(context, R.drawable.drako);
+            }
+
+            try {
+                medio = ContextCompat.getDrawable(context, resMedio);
+            } catch (Exception e) {
+                medio = ContextCompat.getDrawable(context, R.drawable.drako_medio);
+            }
+
+            try {
+                cerrado = ContextCompat.getDrawable(context, resCerrado);
+            } catch (Exception e) {
+                cerrado = ContextCompat.getDrawable(context, R.drawable.drako_cerrado);
+            }
+
+            if (abierto == null) abierto = ContextCompat.getDrawable(context, R.drawable.drako);
+            if (medio == null) medio = (abierto != null) ? abierto : ContextCompat.getDrawable(context, R.drawable.drako_medio);
+            if (cerrado == null) cerrado = (abierto != null) ? abierto : ContextCompat.getDrawable(context, R.drawable.drako_cerrado);
+
+        } catch (Exception e) {
+            Log.e(TAG, "Error cargando imágenes de Drako", e);
+            abierto = ContextCompat.getDrawable(context, R.drawable.drako);
+            medio = ContextCompat.getDrawable(context, R.drawable.drako_medio);
+            cerrado = ContextCompat.getDrawable(context, R.drawable.drako_cerrado);
         }
-
-        abierto = ContextCompat.getDrawable(context, resAbierto);
-        medio = ContextCompat.getDrawable(context, resMedio);
-        cerrado = ContextCompat.getDrawable(context, resCerrado);
-
-        if (abierto == null) abierto = ContextCompat.getDrawable(context, R.drawable.drako);
-        if (medio == null) medio = ContextCompat.getDrawable(context, R.drawable.drako_medio);
-        if (cerrado == null) cerrado = ContextCompat.getDrawable(context, R.drawable.drako_cerrado);
     }
 
     @Override
     public void onInit(int status) {
-        if (status == TextToSpeech.SUCCESS) {
-            int result = tts.setLanguage(new Locale("es", "CO"));
-            if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                result = tts.setLanguage(new Locale("es", "ES"));
-            }
+        if (status == TextToSpeech.SUCCESS && tts != null) {
+            try {
+                int result = tts.setLanguage(new Locale("es", "CO"));
+                if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                    result = tts.setLanguage(new Locale("es", "ES"));
+                }
 
-            if (result != TextToSpeech.LANG_MISSING_DATA && result != TextToSpeech.LANG_NOT_SUPPORTED) {
-                ttsListo = true;
-                tts.setPitch(1.35f);       // Tono más agudo para voz de dragoncito
-                tts.setSpeechRate(0.95f);   // Velocidad cómoda de lectura
+                if (result != TextToSpeech.LANG_MISSING_DATA && result != TextToSpeech.LANG_NOT_SUPPORTED) {
+                    ttsListo = true;
+                    tts.setPitch(1.35f);
+                    tts.setSpeechRate(0.95f);
 
-                tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
-                    @Override
-                    public void onStart(String utteranceId) {
-                        MusicaManager.bajarVolumen();
-                    }
+                    tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+                        @Override
+                        public void onStart(String utteranceId) {
+                            MusicaManager.bajarVolumen();
+                        }
 
-                    @Override
-                    public void onDone(String utteranceId) {
-                        MusicaManager.subirVolumen();
-                    }
+                        @Override
+                        public void onDone(String utteranceId) {
+                            MusicaManager.subirVolumen();
+                        }
 
-                    @Override
-                    public void onError(String utteranceId) {
-                        MusicaManager.subirVolumen();
-                    }
-                });
+                        @Override
+                        public void onError(String utteranceId) {
+                            MusicaManager.subirVolumen();
+                        }
+                    });
 
-                if (tvGlobo != null && tvGlobo.getVisibility() == View.VISIBLE) {
-                    String textoInicial = tvGlobo.getText().toString();
-                    if (!textoInicial.isEmpty()) {
-                        handler.post(() -> hablar(textoInicial));
+                    if (tvGlobo != null && tvGlobo.getVisibility() == View.VISIBLE && tvGlobo.getText() != null) {
+                        String textoInicial = tvGlobo.getText().toString();
+                        if (!textoInicial.trim().isEmpty()) {
+                            handler.post(() -> hablar(textoInicial));
+                        }
                     }
                 }
+            } catch (Exception e) {
+                Log.e(TAG, "Error en onInit TTS", e);
             }
         }
     }
 
-    // LÓGICA ANTI-SATURACIÓN DE CLICS
     private void alHacerClickEnDrako() {
         long tiempoActual = SystemClock.elapsedRealtime();
         long tiempoTranscurrido = tiempoActual - ultimoClickTime;
@@ -307,20 +341,25 @@ public class DrakoHelper implements TextToSpeech.OnInitListener {
         mostrarTextoEspecial(frase);
     }
 
-    // PARPADEO CORREGIDO
+    // ANIMACIÓN DE PARPADEO CORREGIDA Y PROTEGIDA
     private void parpadear(int paso) {
-        Drawable[] frames = {medio, cerrado, medio, abierto};
-        long[] pausas = {50, 70, 50};
-
         if (imgDrako == null) return;
+        try {
+            Drawable[] frames = {medio, cerrado, medio, abierto};
+            long[] pausas = {50, 70, 50};
 
-        imgDrako.setImageDrawable(frames[paso]);
+            Drawable frameActual = frames[paso];
+            if (frameActual != null) {
+                imgDrako.setImageDrawable(frameActual);
+            }
 
-        // Sintaxis corregida: (paso < frames.length - 1)
-        if (paso < frames.length - 1) {
-            handler.postDelayed(() -> parpadear(paso + 1), pausas[paso]);
-        } else {
-            programarSiguiente();
+            if (paso < frames.length - 1) {
+                handler.postDelayed(() -> parpadear(paso + 1), pausas[paso]);
+            } else {
+                programarSiguiente();
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error en parpadear", e);
         }
     }
 
@@ -329,7 +368,7 @@ public class DrakoHelper implements TextToSpeech.OnInitListener {
     }
 
     public void iniciar() {
-        cargarSpritesSegunTraje(); // Refresca las imágenes por si se cambió de traje recientemente
+        cargarSpritesSegunTraje();
         handler.removeCallbacksAndMessages(null);
         darConsejoOSaludo();
         handler.postDelayed(() -> parpadear(0), 1500);
@@ -354,8 +393,12 @@ public class DrakoHelper implements TextToSpeech.OnInitListener {
         if (texto == null || texto.trim().isEmpty()) return;
 
         if (ttsListo && tts != null) {
-            String textoLimpio = texto.replaceAll("[^\\p{L}\\p{N}\\p{P}\\p{Z}]", "").trim();
-            tts.speak(textoLimpio, TextToSpeech.QUEUE_FLUSH, null, "drako_speech");
+            try {
+                String textoLimpio = texto.replaceAll("[^\\p{L}\\p{N}\\p{P}\\p{Z}]", "").trim();
+                tts.speak(textoLimpio, TextToSpeech.QUEUE_FLUSH, null, "drako_speech");
+            } catch (Exception e) {
+                Log.e(TAG, "Error al hablar TTS", e);
+            }
         }
     }
 
@@ -371,7 +414,9 @@ public class DrakoHelper implements TextToSpeech.OnInitListener {
 
     private void detenerVoz() {
         if (tts != null && tts.isSpeaking()) {
-            tts.stop();
+            try {
+                tts.stop();
+            } catch (Exception ignored) {}
         }
         if (vozLocal != null) {
             try {
@@ -386,7 +431,9 @@ public class DrakoHelper implements TextToSpeech.OnInitListener {
     public void liberar() {
         detenerVoz();
         if (tts != null) {
-            tts.shutdown();
+            try {
+                tts.shutdown();
+            } catch (Exception ignored) {}
             tts = null;
         }
     }
@@ -459,7 +506,13 @@ public class DrakoHelper implements TextToSpeech.OnInitListener {
         if (tvGlobo == null) return;
 
         String[] mensajes = obtenerMensajes();
-        int indexActual = indicesMensajes.get(tipoPantalla);
+
+        Integer indexObj = indicesMensajes.get(tipoPantalla);
+        int indexActual = (indexObj != null) ? indexObj : 0;
+
+        if (indexActual >= mensajes.length) {
+            indexActual = 0;
+        }
 
         String textoAMostrar = mensajes[indexActual];
 

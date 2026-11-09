@@ -18,6 +18,9 @@ public class Premio extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_canje_puntos);
 
+        // Inicializar gestor de audio
+        MusicaManager.init(this);
+
         // Instancia unificada del administrador de progreso
         progreso = new ProgresoManager(this);
 
@@ -55,8 +58,17 @@ public class Premio extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        // Reproduce la música de fondo al entrar o regresar a la vista de canje
+        MusicaManager.reanudar(this, MusicaManager.Pista.AMBIENTE);
         actualizarPuntos();
         actualizarVisualesDePremios();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Pausa la música cuando la actividad pasa a segundo plano
+        MusicaManager.pausar();
     }
 
     private void actualizarPuntos() {

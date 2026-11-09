@@ -6,9 +6,12 @@ import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.OvershootInterpolator;
@@ -51,10 +54,29 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
     private final Handler handlerJuego = new Handler(Looper.getMainLooper());
     private boolean monedaDisponible = false;
     private View imgMoneda;
-    private Runnable tareaHuida;
     private volatile boolean procesandoFrame = false;
-    private static final long TIEMPO_HUIDA_MS = 12000;
     private static final int CAMERA_PERMISSION_CODE = 101;
+
+    // TIEMPOS FIJOS ESTÁTICOS DE JUEGO (EN MILISEGUNDOS)
+    private static final long TIEMPO_FASE1_MS = 15000; // 15 segundos fijos para Persecución (5 vidas)
+    private static final long TIEMPO_FASE2_MS = 6000;  // 6 segundos fijos por asomada en Escondite (3 vidas)
+
+    // Reloj Temporizador de Cuenta Regresiva
+    private CountDownTimer timerJuego;
+    private int tiempoRestanteSegundos = 0;
+
+    // Lógica de Vidas por Fases
+    private static final int TOQUES_FASE1_TOTAL = 5; // 5 corazones al inicio
+    private int toquesFase1Actuales = 0;
+
+    private static final int TOQUES_FASE2_TOTAL = 3; // 3 corazones en el escondite
+    private int toquesFase2Actuales = 0;
+
+    private boolean estaEscondido = false;
+    private boolean esperandoToquePopUp = false;
+    private boolean estaAturdido = false;
+    private Runnable runnablePopUp;
+    private Runnable runnableReanudarMovimiento;
 
     // Parte A: Campos de anclaje por sensores
     private AnclajeSensor anclajeSensor;
@@ -90,10 +112,8 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_acertijo_caza_colores);
 
-        // Obtener usuario_id
         usuarioId = getIntent().getLongExtra("usuario_id", -1);
 
-        // Inicializar gestor de sonido y contexto global
         MusicaManager.init(this);
         progreso = new ProgresoManager(this);
 
@@ -102,20 +122,32 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
             imgMoneda.setOnClickListener(v -> recolectarMonedaSorpresa());
         }
 
-        // 1. Vincular vistas del XML
         previewView = findViewById(R.id.previewView);
         tvAcertijo = findViewById(R.id.tvAcertijo);
         tvEstadoEscaneo = findViewById(R.id.tvEstadoEscaneo);
         progressBarColor = findViewById(R.id.progressBarColor);
         imgMariposa = findViewById(R.id.imgMariposaPersecucion);
 
-        // Vistas para la animación del trofeo
+        // Ampliar área táctil (hitbox) agregando margen transparente interno
+        if (imgMariposa != null) {
+            int paddingPx = (int) (18 * getResources().getDisplayMetrics().density);
+            imgMariposa.setPadding(paddingPx, paddingPx, paddingPx, paddingPx);
+
+            // Detección instantánea al presionar (ACTION_DOWN)
+            imgMariposa.setOnTouchListener((v, event) -> {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    alAtraparMariposa();
+                    return true;
+                }
+                return false;
+            });
+        }
+
         layoutTrofeo = findViewById(R.id.layoutTrofeo);
         imgTrofeo = findViewById(R.id.imgTrofeo);
         tvTrofeoNombre = findViewById(R.id.tvTrofeoNombre);
         tvTrofeoPuntos = findViewById(R.id.tvTrofeoPuntos);
 
-        // Navegación directa a la pantalla de Premios al tocar el trofeo
         if (imgTrofeo != null) {
             imgTrofeo.setOnClickListener(v -> {
                 Intent intent = new Intent(this, PremiosActivity.class);
@@ -129,7 +161,6 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
         TextView tvGlobo = drakoContainer.findViewById(R.id.tvGlobo);
         btnDrakoAccion = drakoContainer.findViewById(R.id.btnDrakoAccion);
 
-        // 2. Inicializar controladores y sensores
         drakoHelper = new DrakoHelper(
                 this,
                 imgDrako,
@@ -140,12 +171,6 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
         colorHuntController = new ColorHuntController();
         anclajeSensor = new AnclajeSensor(this);
 
-        // Listener de toque para atrapar al personaje
-        if (imgMariposa != null) {
-            imgMariposa.setOnClickListener(v -> alAtraparMariposa());
-        }
-
-        // 3. Cargar acertijos e iniciar
         cargarAcertijos();
         verificarPermisoCamara();
     }
@@ -167,7 +192,7 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
     private void evaluarAparicionMoneda() {
         if (monedaDisponible) return;
 
-        if (random.nextInt(100) < 30) { // 30% de probabilidad
+        if (random.nextInt(100) < 30) {
             monedaDisponible = true;
             if (imgMoneda != null) {
                 imgMoneda.setVisibility(View.VISIBLE);
@@ -371,8 +396,15 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
     }
 
     private void mostrarAcertijoActual() {
+        cancelarTimer();
         handlerJuego.removeCallbacksAndMessages(null);
         ocultarTrofeo();
+
+        estaEscondido = false;
+        esperandoToquePopUp = false;
+        estaAturdido = false;
+        toquesFase1Actuales = 0;
+        toquesFase2Actuales = 0;
 
         if (imgMariposa != null) {
             imgMariposa.setVisibility(View.GONE);
@@ -386,6 +418,7 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
             progressBarColor.setProgress(0);
         }
         if (tvEstadoEscaneo != null) {
+            tvEstadoEscaneo.setTextColor(Color.WHITE);
             tvEstadoEscaneo.setText("Presiona '¡Buscar Color!' para iniciar");
         }
 
@@ -406,6 +439,7 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
                             progressBarColor.setProgress(0);
                         }
                         if (tvEstadoEscaneo != null) {
+                            tvEstadoEscaneo.setTextColor(Color.WHITE);
                             tvEstadoEscaneo.setText("Apunta el cuadro central hacia el color objetivo...");
                         }
 
@@ -420,9 +454,9 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
                                                 progressBarColor.setProgress(progress);
                                             }
 
-                                            if (progress > 0 && !enPersecucion && tvEstadoEscaneo != null) {
+                                            if (progress > 0 && !enPersecucion && !esperandoToquePopUp && tvEstadoEscaneo != null) {
                                                 tvEstadoEscaneo.setText("¡Detectando color! Mantén fijo (" + progress + "%)");
-                                            } else if (!enPersecucion && tvEstadoEscaneo != null) {
+                                            } else if (!enPersecucion && !esperandoToquePopUp && tvEstadoEscaneo != null) {
                                                 tvEstadoEscaneo.setText("Caza de colores iniciada, buscando...");
                                             }
                                         });
@@ -447,29 +481,37 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
     }
 
     private void alDetectarColorExitoso() {
-        if (enPersecucion) return;
+        if (enPersecucion || esperandoToquePopUp) return;
         colorHuntController.setScanningActive(false);
         if (progressBarColor != null) progressBarColor.setVisibility(View.GONE);
 
-        if (tvEstadoEscaneo != null && acertijoActual != null) {
-            tvEstadoEscaneo.setText("Shhh... algo se mueve dentro del "
-                    + acertijoActual.getColorNombre() + "...");
+        if (estaEscondido) {
+            if (tvEstadoEscaneo != null && acertijoActual != null) {
+                tvEstadoEscaneo.setText("Shhh... ¡está escondido en el "
+                        + acertijoActual.getColorNombre() + "! Prepara tu dedo...");
+            }
+            programarPopUpEscondido();
+        } else {
+            if (tvEstadoEscaneo != null && acertijoActual != null) {
+                tvEstadoEscaneo.setText("Shhh... algo se mueve dentro del "
+                        + acertijoActual.getColorNombre() + "...");
+            }
+            handlerJuego.postDelayed(this::iniciarJuegoPersecucion, 800 + random.nextInt(2200));
         }
-
-        handlerJuego.postDelayed(this::iniciarJuegoPersecucion, 800 + random.nextInt(2200));
     }
 
+    // --- FASE 1: PRIMERA APARICIÓN (5 VIDAS + RELOJ FIJO DE 15s) ---
     private void iniciarJuegoPersecucion() {
         if (imgMariposa == null) return;
         enPersecucion = true;
+        esperandoToquePopUp = false;
+        estaAturdido = false;
+        toquesFase1Actuales = 0;
+
         MusicaManager.reproducirEfecto(R.raw.sfx_aparece);
 
         if (acertijoActual != null && acertijoActual.getImagenPersonajeResId() != 0) {
             imgMariposa.setImageResource(acertijoActual.getImagenPersonajeResId());
-        }
-
-        if (tvEstadoEscaneo != null) {
-            tvEstadoEscaneo.setText("¡Salió! ¡Tócalo antes de que huya!");
         }
 
         View raiz = findViewById(R.id.rootLayout);
@@ -492,21 +534,48 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
                 .withEndAction(this::animarMariposa)
                 .start();
 
-        tareaHuida = this::drakoHuye;
-        handlerJuego.postDelayed(tareaHuida, TIEMPO_HUIDA_MS);
+        // Reloj fijo de 15 segundos para la Fase 1
+        iniciarTimerFase1(TIEMPO_FASE1_MS);
+    }
+
+    private void iniciarTimerFase1(long duracionMs) {
+        cancelarTimer();
+        timerJuego = new CountDownTimer(duracionMs, 100) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                tiempoRestanteSegundos = (int) Math.ceil(millisUntilFinished / 1000.0);
+                actualizarTextoEstado();
+            }
+
+            @Override
+            public void onFinish() {
+                if (enPersecucion && !esperandoToquePopUp) {
+                    drakoHuye();
+                }
+            }
+        }.start();
     }
 
     private void drakoHuye() {
         if (!enPersecucion) return;
+        cancelarTimer();
         enPersecucion = false;
+
         if (imgMariposa != null) {
             imgMariposa.animate().cancel();
             imgMariposa.setVisibility(View.GONE);
         }
 
+        estaEscondido = true; // Activa la 2da escapatoria (modo escondite Pop-up)
+
         if (tvEstadoEscaneo != null && acertijoActual != null) {
-            tvEstadoEscaneo.setText("¡Se escapó! Busca otro objeto "
-                    + acertijoActual.getColorNombre() + " para encontrarlo");
+            tvEstadoEscaneo.setTextColor(Color.WHITE);
+            tvEstadoEscaneo.setText("¡Se escondió! Apunta de nuevo al color "
+                    + acertijoActual.getColorNombre() + " para encontrar su escondite...");
+        }
+
+        if (drakoHelper != null && acertijoActual != null) {
+            drakoHelper.mostrarTextoEspecial("¡Se escondió! Re-enfoca el color " + acertijoActual.getColorNombre() + " para que asome la cabeza.");
         }
 
         if (progressBarColor != null) {
@@ -517,8 +586,88 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
         colorHuntController.setScanningActive(true);
     }
 
+    // --- FASE 2: MODO ESCONDITE / POP-UP (3 VIDAS + RELOJ FIJO DE 6s POR INTENTO) ---
+    private void programarPopUpEscondido() {
+        if (runnablePopUp != null) handlerJuego.removeCallbacks(runnablePopUp);
+
+        int tiempoEspera = (2 + random.nextInt(3)) * 1000;
+        runnablePopUp = this::mostrarCabecitaEmergente;
+        handlerJuego.postDelayed(runnablePopUp, tiempoEspera);
+    }
+
+    private void mostrarCabecitaEmergente() {
+        if (imgMariposa == null) return;
+        toquesFase2Actuales = 0;
+        esperandoToquePopUp = true;
+        enPersecucion = true;
+        estaAturdido = false;
+
+        MusicaManager.reproducirEfecto(R.raw.sfx_aparece);
+
+        if (acertijoActual != null && acertijoActual.getImagenPersonajeResId() != 0) {
+            imgMariposa.setImageResource(acertijoActual.getImagenPersonajeResId());
+        }
+
+        View raiz = findViewById(R.id.rootLayout);
+        if (raiz == null) raiz = previewView;
+
+        float[] c = colorHuntController.getCentroColor();
+        float cx = (c != null && raiz != null) ? c[0] * raiz.getWidth() : (raiz != null ? raiz.getWidth() / 2f : 500f);
+        float cy = (c != null && raiz != null) ? c[1] * raiz.getHeight() : (raiz != null ? raiz.getHeight() / 2f : 500f);
+
+        imgMariposa.setX(cx - mitadPersonaje());
+        imgMariposa.setY(cy - mitadPersonaje());
+        imgMariposa.setVisibility(View.VISIBLE);
+        imgMariposa.setScaleX(0.2f);
+        imgMariposa.setScaleY(0.2f);
+
+        imgMariposa.animate()
+                .scaleX(1.1f)
+                .scaleY(1.1f)
+                .setDuration(350)
+                .setInterpolator(new OvershootInterpolator())
+                .start();
+
+        // Reloj fijo de 6 segundos para dar los 3 toques en el escondite
+        iniciarTimerFase2(TIEMPO_FASE2_MS);
+    }
+
+    private void iniciarTimerFase2(long duracionMs) {
+        cancelarTimer();
+        timerJuego = new CountDownTimer(duracionMs, 100) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                tiempoRestanteSegundos = (int) Math.ceil(millisUntilFinished / 1000.0);
+                actualizarTextoEstado();
+            }
+
+            @Override
+            public void onFinish() {
+                if (esperandoToquePopUp) {
+                    esperandoToquePopUp = false;
+                    enPersecucion = false;
+
+                    imgMariposa.animate()
+                            .scaleX(0f)
+                            .scaleY(0f)
+                            .setDuration(250)
+                            .withEndAction(() -> imgMariposa.setVisibility(View.GONE))
+                            .start();
+
+                    if (tvEstadoEscaneo != null) {
+                        tvEstadoEscaneo.setTextColor(Color.WHITE);
+                        tvEstadoEscaneo.setText("¡Se volvió a esconder! Sigue buscando...");
+                    }
+
+                    programarPopUpEscondido();
+                }
+            }
+        }.start();
+    }
+
+    // --- ANIMACIÓN CON TURBO Y MEJORA DE ATURDIMIENTO (STUN) ---
     private void animarMariposa() {
-        if (!enPersecucion || imgMariposa == null) return;
+        if (!enPersecucion || imgMariposa == null || esperandoToquePopUp || estaAturdido) return;
 
         View parentView = (View) imgMariposa.getParent();
         if (parentView == null) return;
@@ -535,16 +684,132 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
         float nextX = random.nextInt(Math.max(1, maxX));
         float nextY = minY + random.nextInt(Math.max(1, Math.max(1, maxY - minY)));
 
+        // Turbo de velocidad al llegar a las últimas 2 vidas (toques >= 3)
+        long duracion = (toquesFase1Actuales >= 3) ? (350 + random.nextInt(250)) : (900 + random.nextInt(500));
+
         imgMariposa.animate()
                 .x(nextX)
                 .y(nextY)
-                .setDuration(900 + random.nextInt(500))
+                .setDuration(duracion)
                 .withEndAction(() -> {
-                    if (enPersecucion) {
+                    if (enPersecucion && !esperandoToquePopUp && !estaAturdido) {
                         animarMariposa();
                     }
                 })
                 .start();
+    }
+
+    // --- LÓGICA DE IMPACTO CON ATURDIMIENTO (STUN) DE 300ms ---
+    private void alAtraparMariposa() {
+        if ((!enPersecucion && !esperandoToquePopUp) || imgMariposa == null) return;
+
+        MusicaManager.reproducirEfecto(R.raw.sfx_moneda);
+
+        // MEJORA: Pausa de 300ms ("Stun") para facilitar los toques seguidos
+        estaAturdido = true;
+        imgMariposa.animate().cancel();
+
+        imgMariposa.setScaleX(1.35f);
+        imgMariposa.setScaleY(1.35f);
+
+        if (runnableReanudarMovimiento != null) {
+            handlerJuego.removeCallbacks(runnableReanudarMovimiento);
+        }
+
+        runnableReanudarMovimiento = () -> {
+            if (imgMariposa != null && enPersecucion) {
+                imgMariposa.setScaleX(1.0f);
+                imgMariposa.setScaleY(1.0f);
+                estaAturdido = false;
+                if (!esperandoToquePopUp) {
+                    animarMariposa();
+                }
+            }
+        };
+        handlerJuego.postDelayed(runnableReanudarMovimiento, 300);
+
+        if (esperandoToquePopUp) {
+            // FASE 2 (Escondite - 3 corazones)
+            toquesFase2Actuales++;
+            int faltantes = TOQUES_FASE2_TOTAL - toquesFase2Actuales;
+            actualizarTextoEstado();
+            if (faltantes > 0) return;
+        } else {
+            // FASE 1 (Persecución - 5 corazones)
+            toquesFase1Actuales++;
+            int faltantes = TOQUES_FASE1_TOTAL - toquesFase1Actuales;
+            actualizarTextoEstado();
+            if (faltantes > 0) return;
+        }
+
+        // --- SI COMPLETÓ TODAS LAS VIDAS DE LA FASE CORRESPONDIENTE ---
+        cancelarTimer();
+        enPersecucion = false;
+        esperandoToquePopUp = false;
+
+        if (runnablePopUp != null) handlerJuego.removeCallbacks(runnablePopUp);
+        if (runnableReanudarMovimiento != null) handlerJuego.removeCallbacks(runnableReanudarMovimiento);
+
+        imgMariposa.animate().cancel();
+        imgMariposa.animate().scaleX(1.4f).scaleY(1.4f).setDuration(250)
+                .withEndAction(() -> {
+                    imgMariposa.setVisibility(View.GONE);
+                    imgMariposa.setScaleX(1f);
+                    imgMariposa.setScaleY(1f);
+
+                    String color = acertijoActual.getColorNombre();
+                    boolean esNuevo = !progreso.estaCapturado(color);
+                    progreso.marcarCapturado(color);
+                    if (esNuevo) {
+                        progreso.sumarPuntos(50);
+                    }
+
+                    mostrarTrofeo(esNuevo);
+                    completarAcertijo();
+                }).start();
+    }
+
+    // --- ACTUALIZACIÓN VISUAL Y ALERTA DE TIEMPO CRÍTICO ---
+    private void actualizarTextoEstado() {
+        if (tvEstadoEscaneo == null) return;
+
+        // MEJORA: Cambio a color ROJO en los últimos 3 segundos
+        if (tiempoRestanteSegundos <= 3) {
+            tvEstadoEscaneo.setTextColor(Color.RED);
+        } else {
+            tvEstadoEscaneo.setTextColor(Color.WHITE);
+        }
+
+        if (esperandoToquePopUp) {
+            int faltantes = TOQUES_FASE2_TOTAL - toquesFase2Actuales;
+            String corazones = getCorazonesTexto(faltantes);
+            String alerta = (tiempoRestanteSegundos <= 3) ? "⚠️ ¡TIEMPO CRÍTICO! " : "";
+            tvEstadoEscaneo.setText("⏱️ " + tiempoRestanteSegundos + "s | " + alerta + "⚡ ¡AHÍ ESTÁ! Faltan " + faltantes + " toques (" + corazones + ")");
+        } else if (enPersecucion) {
+            int faltantes = TOQUES_FASE1_TOTAL - toquesFase1Actuales;
+            String corazones = getCorazonesTexto(faltantes);
+            String alerta = (tiempoRestanteSegundos <= 3) ? "⚠️ ¡RAPIDO! " : "";
+            if (toquesFase1Actuales >= 3) {
+                tvEstadoEscaneo.setText("⏱️ " + tiempoRestanteSegundos + "s | " + alerta + "⚡ ¡TURBO! Faltan " + faltantes + " (" + corazones + ")");
+            } else {
+                tvEstadoEscaneo.setText("⏱️ " + tiempoRestanteSegundos + "s | " + alerta + "⚡ ¡TÓCALO! Faltan " + faltantes + " toques (" + corazones + ")");
+            }
+        }
+    }
+
+    private String getCorazonesTexto(int cantidad) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < cantidad; i++) {
+            sb.append("❤️");
+        }
+        return sb.toString();
+    }
+
+    private void cancelarTimer() {
+        if (timerJuego != null) {
+            timerJuego.cancel();
+            timerJuego = null;
+        }
     }
 
     private float mitadPersonaje() {
@@ -613,31 +878,6 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
         imgMariposa.setVisibility(View.VISIBLE);
         imgMariposa.setX(x - mitadPersonaje());
         imgMariposa.setY(y - mitadPersonaje());
-    }
-
-    private void alAtraparMariposa() {
-        if (!enPersecucion || imgMariposa == null) return;
-        enPersecucion = false;
-
-        handlerJuego.removeCallbacks(tareaHuida);
-        imgMariposa.animate().cancel();
-
-        imgMariposa.animate().scaleX(1.3f).scaleY(1.3f).setDuration(250)
-                .withEndAction(() -> {
-                    imgMariposa.setVisibility(View.GONE);
-                    imgMariposa.setScaleX(1f);
-                    imgMariposa.setScaleY(1f);
-
-                    String color = acertijoActual.getColorNombre();
-                    boolean esNuevo = !progreso.estaCapturado(color);
-                    progreso.marcarCapturado(color);
-                    if (esNuevo) {
-                        progreso.sumarPuntos(50);
-                    }
-
-                    mostrarTrofeo(esNuevo);
-                    completarAcertijo();
-                }).start();
     }
 
     private void completarAcertijo() {
@@ -792,13 +1032,12 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
             drakoHelper.iniciar();
         }
         if (anclajeSensor != null) {
-            // Se usa .iniciar() en lugar de .start()
             anclajeSensor.iniciar(r -> {
                 System.arraycopy(r, 0, rActual, 0, 9);
                 tieneOrientacion = true;
-                if (enPersecucion && !anclado) {
+                if (enPersecucion && !anclado && !esperandoToquePopUp) {
                     anclarPersonaje();
-                } else if (enPersecucion && anclado) {
+                } else if (enPersecucion && anclado && !esperandoToquePopUp) {
                     proyectarPersonaje();
                 }
             });
@@ -808,12 +1047,12 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+        cancelarTimer();
         MusicaManager.pausar();
         if (drakoHelper != null) {
             drakoHelper.detener();
         }
         if (anclajeSensor != null) {
-            // Se usa .detener() en lugar de .stop()
             anclajeSensor.detener();
         }
     }
@@ -821,6 +1060,7 @@ public class Acertijo_Caza_Colores extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        cancelarTimer();
         if (drakoHelper != null) {
             drakoHelper.liberar();
         }

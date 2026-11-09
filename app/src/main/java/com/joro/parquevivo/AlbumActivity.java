@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -18,9 +19,11 @@ import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -49,9 +52,9 @@ import java.util.concurrent.Executor;
 
 public class AlbumActivity extends AppCompatActivity {
 
-    // Secciones
-    private LinearLayout layoutInicio, layoutCamara;
-    private LinearLayout layoutGaleria, layoutDetalle;
+    // Secciones (layoutInicio es RelativeLayout)
+    private RelativeLayout layoutInicio;
+    private LinearLayout layoutCamara, layoutGaleria, layoutDetalle;
     private DrakoHelper drakoAlbum;
     private DatabaseHelper db;
     private Executor executor;
@@ -97,25 +100,33 @@ public class AlbumActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_album);
 
-        // Obtener el ID del usuario desde el intent
-        usuarioId = getIntent().getLongExtra("usuario_id", -1);
-
-        TextView tvInstruccionAlbum = findViewById(R.id.tvInstruccionAlbum);
-        ImageView imgDrakoAlbum = findViewById(R.id.imgDrakoAlbum); // Conectar vista de Drako
-
-        // Inicializar DrakoHelper vinculado a su ImageView y TextView
-        drakoAlbum = new DrakoHelper(
-                this,
-                imgDrakoAlbum,
-                tvInstruccionAlbum,
-                DrakoHelper.TipoPantalla.ALBUM
-        );
+        // 1. Inicializar administradores base
+        MusicaManager.init(this);
         db = new DatabaseHelper(this);
 
-        // Música de fondo
-        MusicaManager.init(this);
+        // 2. Obtener el ID del usuario desde el intent
+        usuarioId = getIntent().getLongExtra("usuario_id", -1);
 
-        // Conectar secciones
+        // 3. Conectar la vista de Drako y su globo de diálogo flotante
+        ImageView imgDrakoAlbum = findViewById(R.id.imgDrakoAlbum);
+        TextView tvGloboAlbum = findViewById(R.id.tvGloboAlbum);
+
+        // 4. Inicialización segura de DrakoHelper (atrapa tanto Exception como OutOfMemoryError)
+        try {
+            if (imgDrakoAlbum != null && tvGloboAlbum != null) {
+                drakoAlbum = new DrakoHelper(
+                        this,
+                        imgDrakoAlbum,
+                        tvGloboAlbum,
+                        DrakoHelper.TipoPantalla.ALBUM
+                );
+            }
+        } catch (Throwable t) {
+            Log.e("AlbumActivity", "No se pudo cargar a Drako en el Álbum por memoria/recursos", t);
+            drakoAlbum = null;
+        }
+
+        // Conectar secciones (layoutInicio resuelto como RelativeLayout)
         layoutInicio = findViewById(R.id.layoutInicioAlbum);
         layoutCamara = findViewById(R.id.layoutCamara);
         layoutGaleria = findViewById(R.id.layoutGaleria);
@@ -140,6 +151,26 @@ public class AlbumActivity extends AppCompatActivity {
         adapter = new FotosAdapter();
         gridFotos.setAdapter(adapter);
         cargarFotos();
+
+        // Registrar Callback para el botón Atrás del sistema (Android 13+)
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (layoutDetalle.getVisibility() == View.VISIBLE) {
+                    mostrarGaleria();
+                } else if (layoutGaleria.getVisibility() == View.VISIBLE) {
+                    mostrarInicio();
+                } else if (layoutCamara.getVisibility() == View.VISIBLE) {
+                    if (fotoPendiente != null) {
+                        descartarFoto();
+                    }
+                    mostrarInicio();
+                } else {
+                    setEnabled(false);
+                    getOnBackPressedDispatcher().onBackPressed();
+                }
+            }
+        });
 
         // BOTONES DEL MENÚ PRINCIPAL
         findViewById(R.id.btnIrCamara).setOnClickListener(v -> {
@@ -215,7 +246,11 @@ public class AlbumActivity extends AppCompatActivity {
         ocultarTodo();
         layoutInicio.setVisibility(View.VISIBLE);
         if (drakoAlbum != null) {
-            drakoAlbum.iniciar();
+            try {
+                drakoAlbum.iniciar();
+            } catch (Throwable t) {
+                Log.e("AlbumActivity", "Error al iniciar Drako", t);
+            }
         }
     }
 
@@ -620,34 +655,34 @@ public class AlbumActivity extends AppCompatActivity {
 
         fotos.clear();
 
-        if (usuarioId == -1) {
+        if (usuarioId == -1 || db == null) {
             if (adapter != null) {
                 adapter.notifyDataSetChanged();
             }
 
-            tvVacio.setVisibility(View.VISIBLE);
+            if (tvVacio != null) {
+                tvVacio.setVisibility(View.VISIBLE);
+            }
             return;
         }
 
-        Cursor cursor = db.obtenerFotosUsuario(usuarioId);
-
+        Cursor cursor = null;
         try {
+            cursor = db.obtenerFotosUsuario(usuarioId);
 
             while (cursor != null && cursor.moveToNext()) {
+                int colIndex = cursor.getColumnIndex("ruta");
+                if (colIndex != -1) {
+                    String ruta = cursor.getString(colIndex);
+                    File archivo = new File(ruta);
 
-                String ruta = cursor.getString(
-                        cursor.getColumnIndexOrThrow("ruta")
-                );
-
-                File archivo = new File(ruta);
-
-                if (archivo.exists()) {
-                    fotos.add(archivo);
+                    if (archivo.exists()) {
+                        fotos.add(archivo);
+                    }
                 }
             }
-
+        } catch (Exception ignored) {
         } finally {
-
             if (cursor != null) {
                 cursor.close();
             }
@@ -657,9 +692,11 @@ public class AlbumActivity extends AppCompatActivity {
             adapter.notifyDataSetChanged();
         }
 
-        tvVacio.setVisibility(
-                fotos.isEmpty() ? View.VISIBLE : View.GONE
-        );
+        if (tvVacio != null) {
+            tvVacio.setVisibility(
+                    fotos.isEmpty() ? View.VISIBLE : View.GONE
+            );
+        }
     }
 
     private class FotosAdapter extends BaseAdapter {
@@ -690,7 +727,6 @@ public class AlbumActivity extends AppCompatActivity {
                     ? (ImageView) convertView
                     : new ImageView(AlbumActivity.this);
 
-            // Multiplicación corregida
             int size = (int) (105 * getResources().getDisplayMetrics().density);
 
             image.setLayoutParams(
@@ -721,25 +757,28 @@ public class AlbumActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
-        MusicaManager.reanudar(
-                this,
-                MusicaManager.Pista.AMBIENTE
-        );
+        MusicaManager.reanudar(this, MusicaManager.Pista.AMBIENTE);
 
         if (drakoAlbum != null) {
-            drakoAlbum.iniciar(); // Inicia voz TTS y animación con el traje equipado
+            try {
+                drakoAlbum.iniciar();
+            } catch (Throwable t) {
+                Log.e("AlbumActivity", "Error al reanudar Drako", t);
+            }
         }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-
         MusicaManager.pausar();
 
         if (drakoAlbum != null) {
-            drakoAlbum.detener();
+            try {
+                drakoAlbum.detener();
+            } catch (Throwable t) {
+                Log.e("AlbumActivity", "Error al pausar Drako", t);
+            }
         }
     }
 
@@ -748,33 +787,11 @@ public class AlbumActivity extends AppCompatActivity {
         super.onDestroy();
 
         if (drakoAlbum != null) {
-            drakoAlbum.liberar(); // Libera el motor TTS al salir
-        }
-    }
-
-    // --------------------------------
-    // BOTÓN ATRÁS DEL CELULAR
-    // --------------------------------
-
-    @Override
-    public void onBackPressed() {
-
-        if (layoutDetalle.getVisibility() == View.VISIBLE) {
-            mostrarGaleria();
-
-        } else if (layoutGaleria.getVisibility() == View.VISIBLE) {
-            mostrarInicio();
-
-        } else if (layoutCamara.getVisibility() == View.VISIBLE) {
-
-            if (fotoPendiente != null) {
-                descartarFoto();
+            try {
+                drakoAlbum.liberar();
+            } catch (Throwable t) {
+                Log.e("AlbumActivity", "Error al liberar Drako", t);
             }
-
-            mostrarInicio();
-
-        } else {
-            super.onBackPressed();
         }
     }
 }

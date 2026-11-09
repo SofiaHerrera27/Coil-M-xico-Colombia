@@ -6,20 +6,19 @@
     android:layout_height="match_parent"
     android:background="@drawable/fondo_parquevivo">
 
-    <!-- Capa de contraste para asegurar legibilidad sobre el fondo del parque -->
+    <!-- Capa de contraste -->
     <View
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#26000000" />
 
-    <!-- 1. MENÚ PRINCIPAL DEL ÁLBUM (RelativeLayout para permitir a Drako flotar) -->
+    <!-- 1. MENÚ PRINCIPAL DEL ÁLBUM -->
     <RelativeLayout
         android:id="@+id/layoutInicioAlbum"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="20dp">
 
-        <!-- Contenedor vertical para título, tarjeta e instrucciones -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -41,7 +40,7 @@
                 android:textSize="28sp"
                 android:textStyle="bold" />
 
-            <!-- Tarjeta blanca translúcida para el texto de instruccion -->
+            <!-- Tarjeta con instrucciones -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -103,7 +102,7 @@
                 android:layout_height="0dp"
                 android:layout_weight="1" />
 
-            <!-- Botón Volver al menú anterior -->
+            <!-- Botón Volver -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnVolverInicio"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
@@ -121,7 +120,21 @@
 
         </LinearLayout>
 
-        <!-- GLOBO DE TEXTO DE DRAKO (Posicionado sobre la imagen de Drako) -->
+        <!-- 1. VISTA DE DRAKO (Se declara primero para que su ID exista) -->
+        <ImageView
+            android:id="@+id/imgDrakoAlbum"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="70dp"
+            android:clickable="true"
+            android:elevation="6dp"
+            android:focusable="true"
+            android:src="@drawable/drako" />
+
+        <!-- 2. GLOBO DE TEXTO DE DRAKO (Posicionado sobre imgDrakoAlbum) -->
         <TextView
             android:id="@+id/tvGloboAlbum"
             android:layout_width="wrap_content"
@@ -136,20 +149,6 @@
             android:textColor="#333333"
             android:textSize="14sp"
             android:visibility="gone" />
-
-        <!-- VISTA DE DRAKO (Flotando en la esquina inferior derecha) -->
-        <ImageView
-            android:id="@+id/imgDrakoAlbum"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentEnd="true"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="70dp"
-            android:clickable="true"
-            android:elevation="6dp"
-            android:focusable="true"
-            android:src="@drawable/drako" />
 
     </RelativeLayout>
 
@@ -181,7 +180,6 @@
 
         </FrameLayout>
 
-        <!-- Controles inferiores de la cámara -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="100dp"
